@@ -1,0 +1,391 @@
+Nome,Ticker,Setor,Indústria,Preço
+BRF S.A.,BRFS3,Bens de Consumo,Packaged Foods,21.8
+"B3 S.A. - Brasil, Bolsa, Balcão",B3SA3,Serviços Financeiros,Financial Data & Stock Exchanges,14.44
+Ambev S.A.,ABEV3,Bens de Consumo,Beverages - Brewers,13.42
+Cogna Educação S.A.,COGN3,Bens de Consumo,Education & Training Services,2.85
+Banco do Brasil S.A.,BBAS3,Serviços Financeiros,Banks - Regional,21.85
+Azul S.A.,AZUL4,Industrial,Airlines,0.89
+Lojas Renner S.A.,LREN3,Bens de Consumo Cíclico,Department Stores,19.44
+Banco Bradesco S.A.,BBDC4,Serviços Financeiros,Banks - Regional,16.4
+Petróleo Brasileiro S.A. - Petrobras,PETR4,Energia,Oil & Gas Integrated,32.26
+Banco BTG Pactual S.A.,BPAC11,Serviços Financeiros,Capital Markets,41.1
+Itaúsa S.A.,ITSA4,Industrial,Conglomerates,10.81
+Magazine Luiza S.A.,MGLU3,Bens de Consumo Cíclico,Specialty Retail,8.84
+Minerva S.A.,BEEF3,Bens de Consumo,Farm Products,5.58
+Raia Drogasil S.A.,RADL3,Saúde,Pharmaceutical Retailers,14.27
+Itaú Unibanco Holding S.A.,ITUB4,Serviços Financeiros,Banks - Regional,36.57
+Embraer S.A.,EMBR3,Industrial,Aerospace & Defense,80.79
+Cosan S.A.,CSAN3,Energia,Oil & Gas Refining & Marketing,6.79
+Vibra Energia S.A.,VBBR3,Bens de Consumo Cíclico,Specialty Retail,21.82
+Raízen S.A.,RAIZ4,Utilidade Pública,Utilidade Pública - Renewable,1.64
+"Vamos Locação de Caminhões, Máquinas e Equipamentos S.A.",VAMO3,Industrial,Rental & Leasing Services,4.0
+Azevedo & Travassos S.A.,AZEV4,Industrial,Engineering & Construction,0.59
+Braskem S.A.,BRKM5,Materiais Básicos,Chemicals,10.13
+Vale S.A.,VALE3,Materiais Básicos,Other Industrial Metals & Mining,54.03
+Companhia Energética de Minas Gerais - CEMIG,CMIG4,Utilidade Pública,Utilidade Pública - Diversified,10.76
+WEG S.A.,WEGE3,Industrial,Electrical Equipment & Parts,40.02
+Companhia Brasileira De Distribuicao,PCAR3,Bens de Consumo Cíclico,Department Stores,3.2
+Rumo S.A.,RAIL3,Industrial,Railroads,17.75
+Petróleo Brasileiro S.A. - Petrobras,PETR3,Energia,Oil & Gas Integrated,35.32
+Marcopolo S.A.,POMO4,Industrial,Farm & Heavy Construction Machinery,8.33
+Telefônica Brasil S.A.,VIVT3,Serviços de Comunicação,Telecom Services,31.43
+Cyrela Brazil Realty S.A. Empreendimentos e Participações,CYRE3,Bens de Consumo Cíclico,Residential Construction,25.78
+Motiva Infraestrutura de Mobilidade S.A.,MOTV3,Industrial,Infrastructure Operations,13.45
+CVC Brasil Operadora e Agência de Viagens S.A.,CVCB3,Bens de Consumo Cíclico,Travel Services,2.43
+Usinas Siderúrgicas de Minas Gerais S.A.,USIM5,Materiais Básicos,Steel,4.34
+Brava Energia S.A.,BRAV3,Energia,Oil & Gas E&P,18.03
+Banco Bradesco S.A.,BBDC3,Serviços Financeiros,Banks - Regional,14.08
+Prio S.A.,PRIO3,Energia,Oil & Gas E&P,42.48
+Localiza Rent a Car S.A.,RENT3,Industrial,Rental & Leasing Services,37.91
+Companhia Paranaense de Energia - COPEL,CPLE6,Utilidade Pública,Utilidade Pública - Regulated Electric,12.09
+Equatorial S.A.,EQTL3,Utilidade Pública,Utilidade Pública - Regulated Electric,34.91
+Azevedo & Travassos Energia S.A.,AZTE3,Energia,Oil & Gas E&P,0.65
+Sendas Distribuidora S.A.,ASAI3,Bens de Consumo,Grocery Stores,10.51
+Marfrig Global Foods S.A.,MRFG3,Bens de Consumo,Packaged Foods,23.83
+Rede D'Or São Luiz S.A.,RDOR3,Saúde,Medical Care Facilities,34.55
+Centrais Elétricas Brasileiras S.A. - Eletrobrás,ELET3,Utilidade Pública,Utilidade Pública - Renewable,39.58
+Serena Energia S.A.,SRNA3,Utilidade Pública,Utilidade Pública - Renewable,11.65
+Gerdau S.A.,GGBR4,Materiais Básicos,Steel,16.87
+Companhia Siderúrgica Nacional,CSNA3,Materiais Básicos,Steel,8.07
+Metalurgica Gerdau S.A.,GOAU4,Materiais Básicos,Steel,9.43
+SLC Agrícola S.A.,SLCE3,Bens de Consumo,Farm Products,18.35
+Petroreconcavo S.A.,RECV3,Energia,Oil & Gas E&P,14.08
+Hapvida Participações e Investimentos S.A.,HAPV3,Serviços Financeiros,Insurance - Life,33.99
+Dexco S.A.,DXCO3,Materiais Básicos,Lumber & Wood Production,5.53
+Azzas 2154 S.A.,AZZA3,Bens de Consumo Cíclico,Footwear & Accessories,37.18
+Locaweb Serviços de Internet S.A.,LWSA3,Tecnologia,Software - Infrastructure,3.94
+Oi S.A.,OIBR3,Serviços de Comunicação,Telecom Services,0.62
+Grupo Casas Bahia S.A.,BHIA3,Bens de Consumo Cíclico,Specialty Retail,3.11
+Companhia Brasileira de Alumínio,CBAV3,Materiais Básicos,Aluminum,4.94
+MRV Engenharia e Participações S.A.,MRVE3,Imobiliário,Imobiliário - Development,6.08
+TIM S.A.,TIMS3,Serviços de Comunicação,Telecom Services,21.33
+CSN Mineração S.A.,CMIN3,Materiais Básicos,Steel,5.12
+Eneva S.A.,ENEV3,Utilidade Pública,Utilidade Pública - Diversified,13.43
+Cury Construtora e Incorporadora S.A.,CURY3,Imobiliário,Imobiliário - Development,29.97
+Recrusul S/A,RCSL4,Industrial,Specialty Industrial Machinery,0.95
+Azevedo & Travassos S.A.,AZEV3,Industrial,Engineering & Construction,0.55
+Grupo Mateus S.A.,GMAT3,Bens de Consumo Cíclico,Department Stores,8.01
+Klabin S.A.,KLBN11,Materiais Básicos,Paper & Paper Products,18.85
+Allos S.A.,ALOS3,Imobiliário,Imobiliário Services,22.08
+GPS Participações e Empreendimentos S.A.,GGPS3,Industrial,Specialty Business Services,16.37
+Caixa Seguridade Participações S.A.,CXSE3,Serviços Financeiros,Insurance - Diversified,14.49
+Suzano S.A.,SUZB3,Materiais Básicos,Paper & Paper Products,50.62
+Odontoprev S.A.,ODPV3,Saúde,Saúde Plans,11.01
+Companhia Paranaense de Energia - COPEL,CPLE3,Utilidade Pública,Utilidade Pública - Regulated Electric,11.3
+BB Seguridade Participações S.A.,BBSE3,Serviços Financeiros,Insurance - Diversified,35.51
+Movida Participações S.A.,MOVI3,Industrial,Rental & Leasing Services,6.5
+Pet Center Comércio e Participações S.A.,PETZ3,Bens de Consumo Cíclico,Specialty Retail,3.74
+SIMPAR S.A.,SIMH3,Industrial,Rental & Leasing Services,4.67
+Ânima Holding S.A.,ANIM3,Bens de Consumo,Education & Training Services,4.22
+Multiplan Empreendimentos Imobiliários S.A.,MULT3,Imobiliário,Imobiliário Services,26.76
+Ultrapar Participações S.A.,UGPA3,Energia,Oil & Gas Refining & Marketing,17.7
+Companhia de Saneamento de Minas Gerais,CSMG3,Utilidade Pública,Utilidade Pública - Regulated Water,27.31
+TOTVS S.A.,TOTS3,Tecnologia,Software - Application,42.46
+JHSF Participações S.A.,JHSF3,Imobiliário,Imobiliário - Development,5.21
+Yduqs Participações S.A.,YDUQ3,Bens de Consumo,Education & Training Services,15.39
+Fleury S.A.,FLRY3,Saúde,Diagnostics & Research,12.95
+Banco Santander (Brasil) S.A.,SANB11,Serviços Financeiros,Banks - Regional,28.75
+Helbor Empreendimentos S.A.,HBOR3,Imobiliário,Imobiliário Services,1.98
+Méliuz S.A.,CASH3,Serviços de Comunicação,Internet Content & Information,6.37
+Smartfit Escola de Ginástica e Dança S.A.,SMFT3,Bens de Consumo Cíclico,Leisure,22.76
+Oncoclínicas do Brasil Serviços Médicos S.A.,ONCO3,Saúde,Medical Care Facilities,5.18
+EcoRodovias Infraestrutura e Logística S.A.,ECOR3,Industrial,Infrastructure Operations,7.03
+Lojas Quero-Quero S.A.,LJQQ3,Bens de Consumo Cíclico,Specialty Retail,2.54
+Vivara Participações S.A.,VIVA3,Bens de Consumo Cíclico,Luxury Goods,26.22
+Light S.A.,LIGT3,Utilidade Pública,Utilidade Pública - Renewable,5.92
+Auren Energia S.A.,AURE3,Utilidade Pública,Utilidade Pública - Renewable,9.52
+Iguatemi S.A.,IGTI11,Imobiliário,Imobiliário Services,22.83
+Iguatemi S.A.,IGTI11,Imobiliário,Imobiliário Services,22.83
+Porto Seguro S.A.,PSSA3,Serviços Financeiros,Insurance - Diversified,53.88
+Companhia de Saneamento Básico do Estado de São Paulo - SABESP,SBSP3,Utilidade Pública,Utilidade Pública - Regulated Water,114.46
+Energisa S.A.,ENGI11,Utilidade Pública,Utilidade Pública - Regulated Electric,47.12
+Bradespar S.A.,BRAP4,Serviços Financeiros,Asset Management,16.2
+Randoncorp S.A.,RAPT4,Industrial,Farm & Heavy Construction Machinery,8.69
+Hypera S.A.,HYPE3,Saúde,Drug Manufacturers - Specialty & Generic,27.36
+Intelbras S.A. - Indústria de Telecomunicação Eletrônica Brasileira,INTB3,Tecnologia,Communication Equipment,14.67
+Construtora Tenda S.A.,TEND3,Imobiliário,Imobiliário - Development,23.84
+C&A Modas S.A.,CEAB3,Bens de Consumo Cíclico,Specialty Retail,19.62
+CPFL Energia S.A.,CPFE3,Utilidade Pública,Utilidade Pública - Regulated Electric,38.85
+Americanas S.A.,AMER3,Bens de Consumo Cíclico,Internet Retail,5.29
+"Armac Locação, Logística e Serviços S.A.",ARML3,Industrial,Rental & Leasing Services,3.81
+São Martinho S.A.,SMTO3,Materiais Básicos,Specialty Chemicals,17.36
+M. Dias Branco S.A. Indústria e Comércio de Alimentos,MDIA3,Bens de Consumo,Packaged Foods,26.75
+ISA Energía Brasil S.A.,ISAE4,Utilidade Pública,Utilidade Pública - Independent Power Producers,22.91
+Santos Brasil Participações S.A.,STBP3,Industrial,Marine Shipping,13.78
+EZTEC Empreendimentos e Participações S.A.,EZTC3,Imobiliário,Imobiliário - Development,13.46
+PDG Realty S.A. Empreendimentos e Participações,PDGR3,Imobiliário,Imobiliário - Development,0.25
+Banco Pan S.A.,BPAN4,Serviços Financeiros,Banks - Regional,7.62
+Transmissora Aliança de Energia Elétrica S.A.,TAEE11,Utilidade Pública,Utilidade Pública - Regulated Electric,34.61
+Hidrovias do Brasil S.A.,HBSA3,Industrial,Integrated Freight & Logistics,3.52
+Klabin S.A.,KLBN4,Materiais Básicos,Paper & Paper Products,3.75
+Direcional Engenharia S.A.,DIRR3,Imobiliário,Imobiliário - Development,40.52
+Bemobi Mobile Tech S.A.,BMOB3,Serviços de Comunicação,Entertainment,23.3
+Engie Brasil Energia S.A.,EGIE3,Utilidade Pública,Utilidade Pública - Renewable,43.66
+Três Tentos Agroindustrial S/A,TTEN3,Materiais Básicos,Agricultural Inputs,14.92
+Infracommerce CXaaS S.A.,IFCM3,Industrial,Specialty Business Services,0.05
+Neoenergia S.A.,NEOE3,Utilidade Pública,Utilidade Pública - Regulated Electric,24.95
+Qualicorp Consultoria e Corretora de Seguros S.A.,QUAL3,Saúde,Saúde Plans,1.85
+Plano & Plano Desenvolvimento Imobiliário S.A.,PLPL3,Imobiliário,Imobiliário - Development,15.02
+Companhia de Saneamento do Paraná - SANEPAR,SAPR4,Utilidade Pública,Utilidade Pública - Regulated Water,7.09
+Grendene S.A.,GRND3,Bens de Consumo Cíclico,Footwear & Accessories,5.42
+Enjoei S.A.,ENJU3,Bens de Consumo Cíclico,Internet Retail,1.11
+Boa Safra Sementes S.A.,SOJA3,Materiais Básicos,Agricultural Inputs,11.17
+Moura Dubeux Engenharia S.A.,MDNE3,Imobiliário,Imobiliário Services,24.2
+Centrais Elétricas Brasileiras S.A. - Eletrobrás,ELET6,Utilidade Pública,Utilidade Pública - Renewable,43.84
+Banco do Estado do Rio Grande do Sul S.A.,BRSR6,Serviços Financeiros,Banks - Regional,11.41
+Companhia de Saneamento do Paraná - SANEPAR,SAPR11,Utilidade Pública,Utilidade Pública - Regulated Water,36.17
+International Meal Company Alimentação S.A.,MEAL3,Bens de Consumo Cíclico,Restaurants,1.24
+Grupo SBF S.A.,SBFG3,Bens de Consumo Cíclico,Specialty Retail,12.71
+"Mills Locação, Serviços e Logística S.A.",MILS3,Industrial,Rental & Leasing Services,11.27
+Kepler Weber S.A.,KEPL3,Industrial,Farm & Heavy Construction Machinery,7.97
+Camil Alimentos S.A.,CAML3,Bens de Consumo,Packaged Foods,5.29
+Alupar Investimento S.A.,ALUP11,Utilidade Pública,Utilidade Pública - Renewable,30.75
+Alpargatas S.A.,ALPA4,Bens de Consumo Cíclico,Footwear & Accessories,8.87
+Grupo Multi S.A.,MLAS3,Tecnologia,Electronics & Computer Distribution,1.06
+CM Hospitalar S/A,VVEO3,Saúde,Medical Distribution,1.17
+Positivo Tecnologia S.A.,POSI3,Tecnologia,Computer Hardware,4.95
+Empreendimentos Pague Menos S.A.,PGMN3,Saúde,Pharmaceutical Retailers,3.37
+Irani Papel e Embalagem S.A.,RANI3,Bens de Consumo Cíclico,Packaging & Containers,7.26
+Iochpe-Maxion S.A.,MYPK3,Bens de Consumo Cíclico,Auto Parts,13.45
+Jalles Machado S/A,JALL3,Bens de Consumo,Confectioners,3.82
+Blau Farmacêutica S.A.,BLAU3,Saúde,Drug Manufacturers - Specialty & Generic,13.11
+MPM Corpóreos S.A.,ESPA3,Bens de Consumo Cíclico,Personal Services,1.19
+Priner Serviços Industriais S.A.,PRNR3,Industrial,Engineering & Construction,15.63
+Melnick Desenvolvimento Imobiliário S.A.,MELK3,Imobiliário,Imobiliário Services,3.54
+Mitre Realty Empreendimentos e Participações S.A.,MTRE3,Imobiliário,Imobiliário - Development,4.04
+Itaú Unibanco Holding S.A.,ITUB3,Serviços Financeiros,Banks - Regional,32.74
+Ser Educacional S.A.,SEER3,Bens de Consumo,Education & Training Services,9.22
+IRB-Brasil Resseguros S.A.,IRBR3,Serviços Financeiros,Insurance - Reinsurance,45.92
+Banco ABC Brasil S.A.,ABCB4,Serviços Financeiros,Banks - Regional,21.32
+Vulcabras S.A.,VULC3,Bens de Consumo Cíclico,Footwear & Accessories,21.36
+Cruzeiro do Sul Educacional S.A.,CSED3,Bens de Consumo,Education & Training Services,5.08
+Cia de Ferro Ligas da Bahia S.A. - FERBASA,FESA4,Materiais Básicos,Steel,6.87
+Schulz S.A.,SHUL4,Bens de Consumo Cíclico,Auto Parts,5.24
+Sequoia Logística e Transportes S.A.,SEQL3,Industrial,Integrated Freight & Logistics,1.05
+Usinas Siderúrgicas de Minas Gerais S.A.,USIM3,Materiais Básicos,Steel,4.36
+Guararapes Confecções S.A.,GUAR3,Bens de Consumo Cíclico,Apparel Retail,8.5
+Diagnósticos da América S.A.,DASA3,Saúde,Diagnostics & Research,1.38
+Orizon Valorização de Resíduos S.A.,ORVR3,Industrial,Waste Management,52.41
+Tupy S.A.,TUPY3,Industrial,Metal Fabrication,17.99
+Hospital Mater Dei S.A.,MATD3,Saúde,Medical Care Facilities,4.45
+Dimed S.A. Distribuidora de Medicamentos,PNVL3,Saúde,Drug Manufacturers - General,9.5
+Wilson Sons S.A.,PORT3,Industrial,Marine Shipping,17.47
+Syn Prop & Tech S.A.,SYNE3,Imobiliário,Imobiliário - Diversified,6.11
+Even Construtora e Incorporadora S.A.,EVEN3,Imobiliário,Imobiliário - Development,7.34
+Banco BMG S.A.,BMGB4,Serviços Financeiros,Banks - Regional,3.67
+Unifique Telecomunicações S.A.,FIQE3,Serviços de Comunicação,Telecom Services,3.81
+Tegma Gestão Logística S.A.,TGMA3,Industrial,Trucking,36.38
+N/A,BRST3,Serviços de Comunicação,Telecom Services,2.78
+Trisul S.A.,TRIS3,Imobiliário,Imobiliário Services,6.91
+JSL S.A.,JSLG3,Industrial,Integrated Freight & Logistics,5.85
+Track & Field Co S.A.,TFCO4,Bens de Consumo Cíclico,Apparel Retail,15.0
+HBR Realty Empreendimentos Imobiliários S.A.,HBRE3,Imobiliário,Imobiliário Services,3.13
+Valid Soluções S.A.,VLID3,Industrial,Specialty Business Services,24.26
+Eternit S.A.,ETER3,Industrial,Building Products & Equipment,4.0
+Klabin S.A.,KLBN3,Materiais Básicos,Paper & Paper Products,3.85
+PBG S.A.,PTBL3,Industrial,Building Products & Equipment,4.49
+Wiz Co Participações e Corretagem de Seguros S.A.,WIZC3,Serviços Financeiros,Insurance Brokers,8.0
+Lavvi Empreendimentos Imobiliários S.A.,LAVV3,Imobiliário,Imobiliário Services,12.38
+BRBI BR Partners S.A.,BRBI11,Serviços Financeiros,Capital Markets,16.93
+Gafisa S.A.,GFSA3,Bens de Consumo Cíclico,Residential Construction,18.03
+Taurus Armas S.A.,TASA4,Industrial,Aerospace & Defense,6.81
+Companhia de Saneamento do Paraná - SANEPAR,SAPR3,Utilidade Pública,Utilidade Pública - Regulated Water,7.68
+MAHLE Metal Leve S.A.,LEVE3,Bens de Consumo Cíclico,Auto Parts,29.82
+Technos S.A.,TECN3,Bens de Consumo Cíclico,Luxury Goods,6.31
+OceanPact Serviços Marítimos S.A.,OPCT3,Industrial,Specialty Business Services,6.94
+Itaúsa S.A.,ITSA3,Industrial,Conglomerates,10.82
+Marcopolo S.A.,POMO3,Industrial,Farm & Heavy Construction Machinery,6.81
+Vittia S.A.,VITT3,Materiais Básicos,Agricultural Inputs,4.89
+Paranapanema S.A.,PMAM3,Materiais Básicos,Copper,1.89
+Companhia Energética de Minas Gerais - CEMIG,CMIG3,Utilidade Pública,Utilidade Pública - Diversified,15.33
+Banco Pine S.A.,PINE4,Serviços Financeiros,Banks - Regional,6.03
+BrasilAgro - Companhia Brasileira de Propriedades Agrícolas,AGRO3,Bens de Consumo,Farm Products,20.51
+Fras-le S.A.,FRAS3,Bens de Consumo Cíclico,Auto Parts,26.82
+LOG Commercial Properties e Participações S.A.,LOGG3,Imobiliário,Imobiliário Services,20.61
+Profarma Distribuidora de Produtos Farmacêuticos S.A.,PFRM3,Saúde,Medical Distribution,8.06
+Zamp S.A.,ZAMP3,Bens de Consumo Cíclico,Restaurants,3.39
+Fertilizantes Heringer S.A.,FHER3,Materiais Básicos,Agricultural Inputs,3.92
+LPS Brasil - Consultoria de Imóveis S.A.,LPSB3,Imobiliário,Imobiliário Services,1.61
+Desktop S.A.,DESK3,Serviços de Comunicação,Telecom Services,8.99
+Alliança Saúde e Participações S.A.,AALR3,Saúde,Diagnostics & Research,4.55
+"Allpark Empreendimentos, Participações e Serviços S.A.",ALPK3,Industrial,Infrastructure Operations,3.19
+Tecnisa S.A.,TCSA3,Imobiliário,Imobiliário - Development,1.7
+"Vitru Brasil Empreendimentos, Participações e Comércio S.A.",VTRU3,Bens de Consumo,Education & Training Services,8.84
+Braskem S.A.,BRKM3,Materiais Básicos,Chemicals,10.55
+Transmissora Aliança de Energia Elétrica S.A.,TAEE4,Utilidade Pública,Utilidade Pública - Regulated Electric,11.55
+Recrusul S/A,RCSL3,Industrial,Specialty Industrial Machinery,2.28
+Unipar Carbocloro S.A.,UNIP6,Materiais Básicos,Chemicals,59.77
+Romi S.A.,ROMI3,Industrial,Industrial Distribution,8.89
+Lupatech S.A.,LUPA3,Energia,Oil & Gas Equipment & Services,1.18
+REAG Investimentos S.A.,REAG3,Serviços Financeiros,Asset Management,3.8
+Inepar S.A. Indústria e Construções,INEP4,Industrial,Specialty Industrial Machinery,1.65
+Ambipar Participações e Empreendimentos S.A.,AMBP3,Industrial,Waste Management,157.99
+Aeris Indústria e Comércio de Equipamentos para Geração de Energia S.A.,AERI3,Industrial,Specialty Industrial Machinery,4.22
+Banco Santander (Brasil) S.A.,SANB3,Serviços Financeiros,Banks - Regional,13.66
+Banco Santander (Brasil) S.A.,SANB4,Serviços Financeiros,Banks - Regional,15.07
+Dexxos Participações S.A.,DEXP3,Materiais Básicos,Chemicals,9.3
+Automob Participações S.A.,AMOB3,Bens de Consumo Cíclico,Auto & Truck Dealerships,11.79
+Transmissora Aliança de Energia Elétrica S.A.,TAEE3,Utilidade Pública,Utilidade Pública - Regulated Electric,11.47
+d1000 Varejo Farma Participações S.A.,DMVF3,Saúde,Pharmaceutical Retailers,4.95
+Marisa Lojas S.A.,AMAR3,Bens de Consumo Cíclico,Apparel Retail,1.36
+Eucatex S.A. Indústria e Comércio,EUCA4,Industrial,Building Products & Equipment,18.7
+Bradespar S.A.,BRAP3,Serviços Financeiros,Asset Management,15.1
+Viver Incorporadora e Construtora S.A.,VIVR3,Imobiliário,Imobiliário - Development,0.86
+CSU Digital S.A.,CSUD3,Tecnologia,Software - Infrastructure,18.91
+T4F Entretenimento S.A.,SHOW3,Bens de Consumo Cíclico,Leisure,6.61
+Allied Tecnologia S.A.,ALLD3,Tecnologia,Software - Application,7.03
+Renova Energia S.A.,RNEW3,Utilidade Pública,Utilidade Pública - Renewable,0.94
+TC S.A.,TRAD3,Tecnologia,Software - Application,7.45
+Oi S.A.,OIBR4,Serviços de Comunicação,Telecom Services,8.33
+Inepar S.A. Indústria e Construções,INEP3,Industrial,Specialty Industrial Machinery,2.12
+Cambuci S.A.,CAMB3,Bens de Consumo Cíclico,Leisure,10.1
+Metalurgica Gerdau S.A.,GOAU3,Materiais Básicos,Steel,9.47
+Triunfo Participações e Investimentos S.A.,TPIS3,Industrial,Infrastructure Operations,4.12
+Biomm S.A.,BIOM3,Saúde,BioTecnologia,7.97
+Terra Santa Propriedades Agrícolas S.A.,LAND3,Bens de Consumo,Farm Products,10.17
+Energisa S.A.,ENGI3,Utilidade Pública,Utilidade Pública - Regulated Electric,11.72
+Fictor Alimentos S.A.,FICT3,Serviços de Comunicação,Telecom Services,3.48
+Companhia Energética do Ceará - COELCE,COCE5,Utilidade Pública,Utilidade Pública - Regulated Electric,28.0
+Dotz S.A.,DOTZ3,Serviços de Comunicação,Advertising Agencies,5.9
+Livetech da Bahia Indústria e Comércio S.A.,LVTC3,Serviços de Comunicação,Telecom Services,3.6
+Banco Mercantil do Brasil S.A.,BMEB4,Serviços Financeiros,Banks - Regional,38.85
+Electro Aço Altona S.A.,EALT4,Industrial,Metal Fabrication,14.58
+Veste S.A. Estilo,VSTE3,N/A,N/A,6.07
+Unicasa Indústria de Móveis S.A.,UCAS3,Bens de Consumo Cíclico,"Furnishings, Fixtures & Appliances",1.41
+AgroGalaxy Participações S.A.,AGXY3,Materiais Básicos,Agricultural Inputs,6.0
+Alupar Investimento S.A.,ALUP4,Utilidade Pública,Utilidade Pública - Renewable,9.9
+Gerdau S.A.,GGBR3,Materiais Básicos,Steel,15.13
+Empresa Metropolitana de Águas e Energia S.A.,EMAE4,Utilidade Pública,Utilidade Pública - Diversified,30.99
+São Carlos Empreendimentos e Participações S.A.,SCAR3,Imobiliário,Imobiliário Services,16.85
+Renova Energia S.A.,RNEW4,Utilidade Pública,Utilidade Pública - Renewable,0.93
+ISA Energía Brasil S.A.,ISAE3,Utilidade Pública,Utilidade Pública - Independent Power Producers,30.8
+Westwing Comércio Varejista S.A.,WEST3,Bens de Consumo Cíclico,Specialty Retail,3.56
+Companhia Energética de Brasília - CEB,CEBR6,Utilidade Pública,Utilidade Pública - Regulated Electric,22.13
+Banco Pine S.A.,PINE3,Serviços Financeiros,Banks - Regional,6.05
+João Fortes Engenharia S.A.,JFEN3,Imobiliário,Imobiliário Services,1.83
+Whirlpool S.A.,WHRL4,Bens de Consumo Cíclico,"Furnishings, Fixtures & Appliances",4.4
+Whirlpool S.A.,WHRL3,Bens de Consumo Cíclico,"Furnishings, Fixtures & Appliances",4.43
+Bombril S.A.,BOBR4,Bens de Consumo,Household & Personal Products,1.57
+Companhia Energética de Brasília - CEB,CEBR3,Utilidade Pública,Utilidade Pública - Regulated Electric,19.83
+Log-In Logística Intermodal S.A.,LOGN3,Industrial,Marine Shipping,26.8
+Banco da Amazônia S.A.,BAZA3,Serviços Financeiros,Banks - Regional,73.97
+Banestes S.A - Banco do Estado do Espírito Santo,BEES3,Serviços Financeiros,Banks - Regional,8.51
+Centrais Elétricas de Santa Catarina S.A.,CLSC4,Utilidade Pública,Utilidade Pública - Regulated Electric,104.34
+Padtec Holding S.A.,PDTC3,Tecnologia,Communication Equipment,1.05
+Embpar Participacoes S.A.,EPAR3,Materiais Básicos,Lumber & Wood Production,4.96
+RNI Negócios Imobiliários S.A.,RDNI3,Imobiliário,Imobiliário - Development,2.33
+Rossi Residencial S.A.,RSID3,Bens de Consumo Cíclico,Residential Construction,2.08
+Neogrid Participações S.A.,NGRD3,Tecnologia,Software - Application,24.52
+Companhia Habitasul de Participações,HBTS5,Imobiliário,Imobiliário Services,30.0
+Tronox Pigmentos do Brasil S.A.,CRPG5,Materiais Básicos,Chemicals,16.04
+Equatorial Pará Distribuidora de Energia S.A.,EQPA3,Utilidade Pública,Utilidade Pública - Regulated Electric,5.62
+Alpargatas S.A.,ALPA3,Bens de Consumo Cíclico,Footwear & Accessories,8.27
+Iguatemi S.A.,IGTI3,Imobiliário,Imobiliário Services,2.79
+Iguatemi S.A.,IGTI3,Imobiliário,Imobiliário Services,2.79
+Alupar Investimento S.A.,ALUP3,Utilidade Pública,Utilidade Pública - Renewable,11.03
+Sansuy S.A.,SNSY5,Bens de Consumo Cíclico,Auto Parts,3.4
+Banco do Estado do Rio Grande do Sul S.A.,BRSR3,Serviços Financeiros,Banks - Regional,11.9
+Taurus Armas S.A.,TASA3,Industrial,Aerospace & Defense,7.46
+Braskem S.A.,BRKM6,Materiais Básicos,Chemicals,8.0
+Unipar Carbocloro S.A.,UNIP3,Materiais Básicos,Chemicals,53.29
+Alphaville S.A.,AVLL3,Imobiliário,Imobiliário - Development,1.7
+Energisa S.A.,ENGI4,Utilidade Pública,Utilidade Pública - Regulated Electric,8.83
+Bahema Educação S.A.,BIED3,Bens de Consumo,Education & Training Services,3.77
+Refinaria de Petróleos de Manguinhos S.A.,RPMG3,Energia,Oil & Gas Refining & Marketing,2.95
+N/A,ATED3,Serviços de Comunicação,Publishing,1.94
+WLM Participações e Comércio de Máquinas e Veículos S.A.,WLMM4,Bens de Consumo Cíclico,Auto & Truck Dealerships,24.64
+Grazziotin S.A.,CGRA4,Bens de Consumo Cíclico,Department Stores,28.58
+Hotéis Othon S.A.,HOOT4,Bens de Consumo Cíclico,Lodging,4.05
+Nutriplant Indústria e Comércio S/A,NUTR3,Materiais Básicos,Agricultural Inputs,3.44
+Banco BTG Pactual S.A.,BPAC3,Serviços Financeiros,Capital Markets,23.09
+Banestes S.A - Banco do Estado do Espírito Santo,BEES4,Serviços Financeiros,Banks - Regional,8.54
+Minupar Participações S.A.,MNPR3,Bens de Consumo,Farm Products,25.98
+Randoncorp S.A.,RAPT3,Industrial,Farm & Heavy Construction Machinery,8.26
+Pettenati S.A. Industria Têxtil,PTNT4,Bens de Consumo Cíclico,Apparel Manufacturing,4.96
+Döhler S.A.,DOHL4,Bens de Consumo Cíclico,Textile Manufacturing,4.0
+Banco BTG Pactual S.A.,BPAC5,Serviços Financeiros,Capital Markets,8.99
+Rede Energia Participações S.A.,REDE3,Utilidade Pública,Utilidade Pública - Regulated Electric,6.69
+DTCOM - Direct to Company S.A.,DTCY3,Serviços de Comunicação,Telecom Services,3.11
+Companhia Tecidos Santanense Ltda.,CTSA4,Bens de Consumo Cíclico,Textile Manufacturing,2.38
+Trevisa Investimentos S.A.,LUXM4,Industrial,Marine Shipping,4.59
+Metalúrgica Riosulense S.A.,RSUL4,Bens de Consumo Cíclico,Auto Parts,69.76
+Grazziotin S.A.,CGRA3,Bens de Consumo Cíclico,Department Stores,28.71
+Ouro Fino Saúde Animal Participações S.A.,OFSA3,Saúde,Drug Manufacturers - Specialty & Generic,23.79
+General Shopping e Outlets do Brasil S.A.,GSHP3,Imobiliário,Imobiliário - Diversified,4.36
+Panatlântica S.A.,PATI3,Materiais Básicos,Steel,38.88
+Telecomunicações Brasileiras S.A. - Telebras,TELB3,Serviços de Comunicação,Telecom Services,12.3
+Dexxos Participações S.A.,DEXP4,Materiais Básicos,Chemicals,9.31
+Companhia de Fiação e Tecidos Cedro e Cachoeira S.A.,CEDO4,Bens de Consumo Cíclico,Textile Manufacturing,17.0
+Baumer S.A.,BALM4,Saúde,Medical Instruments & Supplies,15.8
+BRB - Banco de Brasília S.A.,BSLI3,Serviços Financeiros,Banks - Regional,7.89
+Companhia de Participações Aliança da Bahia,PEAB4,Serviços Financeiros,Asset Management,45.65
+Rio Paranapanema Energia S.A.,GEPA4,Utilidade Pública,Utilidade Pública - Regulated Electric,34.95
+BRB - Banco de Brasília S.A.,BSLI4,Serviços Financeiros,Banks - Regional,9.0
+Renova Energia S.A.,RNEW11,Utilidade Pública,Utilidade Pública - Renewable,2.8
+HAGA S/A Indústria e Comércio,HAGA3,Industrial,Building Products & Equipment,2.02
+Companhia de Gás de São Paulo - COMGÁS,CGAS5,Utilidade Pública,Utilidade Pública - Regulated Gas,131.0
+Rio Paranapanema Energia S.A.,GEPA3,Utilidade Pública,Utilidade Pública - Regulated Electric,36.0
+Banco do Estado do Rio Grande do Sul S.A.,BRSR5,Serviços Financeiros,Banks - Regional,15.6
+Mangels Industrial S.A.,MGEL4,Materiais Básicos,Steel,4.18
+HAGA S/A Indústria e Comércio,HAGA4,Industrial,Building Products & Equipment,1.18
+Companhia de Gás de São Paulo - COMGÁS,CGAS3,Utilidade Pública,Utilidade Pública - Regulated Gas,129.9
+Centrais Elétricas de Santa Catarina S.A.,CLSC3,Utilidade Pública,Utilidade Pública - Regulated Electric,97.49
+METISA Metalúrgica Timboense S.A.,MTSA4,Industrial,Farm & Heavy Construction Machinery,43.87
+Companhia Energética do Ceará - COELCE,COCE3,Utilidade Pública,Utilidade Pública - Regulated Electric,26.51
+Companhia Energética de Brasília - CEB,CEBR5,Utilidade Pública,Utilidade Pública - Regulated Electric,20.1
+N/A,CCTY3,Imobiliário,Imobiliário - Development,18.78
+Electro Aço Altona S.A.,EALT3,Industrial,Metal Fabrication,15.05
+Wetzel S.A.,MWET4,Bens de Consumo Cíclico,Auto Parts,12.59
+Pettenati S.A. Industria Têxtil,PTNT3,Bens de Consumo Cíclico,Apparel Manufacturing,8.7
+Afluente Transmissão de Energia Elétrica S.A.,AFLT3,Utilidade Pública,Utilidade Pública - Regulated Electric,7.21
+Plascar Participações Industriais S.A.,PLAS3,Bens de Consumo Cíclico,Auto Parts,5.25
+Companhia Tecidos Santanense Ltda.,CTSA3,Bens de Consumo Cíclico,Textile Manufacturing,2.65
+PPLA Participations Ltd.,PPLA11,Serviços Financeiros,Asset Management,1.09
+Bicicletas Monark S.A.,BMKS3,Bens de Consumo Cíclico,Leisure,409.0
+OSX Brasil S.A.,OSXB3,Energia,Oil & Gas Equipment & Services,2.8
+Telecomunicações Brasileiras S.A. - Telebras,TELB4,Serviços de Comunicação,Telecom Services,8.09
+Mundial S.A. - Produtos de Consumo,MNDL3,Bens de Consumo,Household & Personal Products,19.5
+Companhia de Eletricidade do Estado da Bahia - COELBA,CEEB3,Utilidade Pública,Utilidade Pública - Regulated Electric,36.42
+Eucatex S.A. Indústria e Comércio,EUCA3,Industrial,Building Products & Equipment,20.99
+Sansuy S.A.,SNSY3,Bens de Consumo Cíclico,Auto Parts,11.6
+Nexpe Participações S.A.,NEXP3,Imobiliário,Imobiliário Services,3.85
+Companhia Paranaense de Energia - COPEL,CPLE5,Utilidade Pública,Utilidade Pública - Regulated Electric,13.15
+Banco do Estado de Sergipe S.A.,BGIP4,Serviços Financeiros,Banks - Regional,28.9
+Alfa Holdings S.A.,RPAD3,Industrial,Conglomerates,4.51
+Banco do Nordeste do Brasil S.A.,BNBR3,Serviços Financeiros,Banks - Regional,99.75
+Elektro Redes S.A.,EKTR3,Utilidade Pública,Utilidade Pública - Regulated Electric,38.99
+Karsten S.A.,CTKA4,Bens de Consumo Cíclico,Textile Manufacturing,37.0
+Cia de Ferro Ligas da Bahia S.A. - FERBASA,FESA3,Materiais Básicos,Steel,11.4
+Monteiro Aranha S.A.,MOAR3,Industrial,Conglomerates,138.6
+Energisa Mato Grosso - Distribuidora de Energia S/A,ENMT4,Utilidade Pública,Utilidade Pública - Regulated Electric,63.0
+Companhia de Fiação e Tecidos Cedro e Cachoeira S.A.,CEDO3,Bens de Consumo Cíclico,Textile Manufacturing,25.25
+Baumer S.A.,BALM3,Saúde,Medical Instruments & Supplies,21.0
+Manufatura de Brinquedos Estrela S.A.,ESTR4,Bens de Consumo Cíclico,Leisure,3.5
+Cemepe Investimentos S.A.,MAPT4,Serviços Financeiros,Asset Management,4.94
+Companhia Estadual de Distribuição de Energia Elétrica,CEED3,Utilidade Pública,Utilidade Pública - Regulated Electric,7.16
+Elektro Redes S.A.,EKTR4,Utilidade Pública,Utilidade Pública - Regulated Electric,50.23
+São Paulo Turismo S.A.,AHEB5,Bens de Consumo Cíclico,Travel Services,58.0
+Companhia de Eletricidade do Estado da Bahia - COELBA,CEEB5,Utilidade Pública,Utilidade Pública - Regulated Electric,41.0
+Banco Mercantil do Brasil S.A.,BMEB3,Serviços Financeiros,Banks - Regional,33.5
+Unipar Carbocloro S.A.,UNIP5,Materiais Básicos,Chemicals,60.95
+Panatlântica S.A.,PATI4,Materiais Básicos,Steel,34.8
+WLM Participações e Comércio de Máquinas e Veículos S.A.,WLMM3,Bens de Consumo Cíclico,Auto & Truck Dealerships,24.0
+Excelsior Alimentos S.A.,BAUH4,Bens de Consumo,Packaged Foods,82.49
+Empresa Metropolitana de Águas e Energia S.A.,EMAE3,Utilidade Pública,Utilidade Pública - Diversified,150.02
+MRS Logística S.A.,MRSA5B,Industrial,Railroads,25.0
+JOSAPAR Joaquim Oliveira S.A. Participações,JOPA3,Bens de Consumo,Packaged Foods,22.0
+Tronox Pigmentos do Brasil S.A.,CRPG6,Materiais Básicos,Chemicals,18.99
+Ampla Energia e Serviços S.A.,CBEE3,Utilidade Pública,Utilidade Pública - Regulated Electric,9.44
+Bardella S.A. Indústrias Mecânicas,BDLL4,Industrial,Specialty Industrial Machinery,7.45
+Hercules S.A - Fábrica de Talheres,HETA4,Bens de Consumo,Household & Personal Products,5.5
+Banco Mercantil de Investimentos S.A.,BMIN4,Serviços Financeiros,Banks - Regional,17.1
+Natura &Co Holding S.A.,NTCO3,Bens de Consumo,Household & Personal Products,10.8
+Banco do Estado de Sergipe S.A.,BGIP3,Serviços Financeiros,Banks - Regional,34.99
+Equatorial Maranhão Distribuidora de Energia S.A.,EQMA3B,Utilidade Pública,Utilidade Pública - Regulated Electric,27.6
+Nordon Indústrias Metalúrgicas S/A,NORD3,Serviços Financeiros,Shell Companies,6.11
+Energisa Mato Grosso - Distribuidora de Energia S/A,ENMT3,Utilidade Pública,Utilidade Pública - Regulated Electric,65.9
+Karsten S.A.,CTKA3,Bens de Consumo Cíclico,Textile Manufacturing,34.18
+Metalfrio Solutions S.A.,FRIO3,Bens de Consumo Cíclico,"Furnishings, Fixtures & Appliances",220.0
+Alfa Holdings S.A.,RPAD6,Industrial,Conglomerates,4.04
+Tronox Pigmentos do Brasil S.A.,CRPG3,Materiais Básicos,Chemicals,18.5
+Iguatemi S.A.,IGTI4,Imobiliário,Imobiliário Services,10.0

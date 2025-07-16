@@ -161,7 +161,6 @@ $RECYCLE.BIN/
 .streamlit/
 
 # Project specific
-*.csv
 *.xlsx
 *.json
 logs/

@@ -83,7 +83,7 @@ st.markdown("""
     h3 {
         font-size: 1.2rem !important;
     }
-    
+     
     .stInfo {
         font-size: 0.8rem;
     }
@@ -414,9 +414,9 @@ def mostrar_parametros_algoritmo():
                 st.rerun()
 
 def calcular_benchmarks(returns_data, capital_inicial, dias, acoes_selecionadas):
-    """Calcula benchmarks: Bovespa e carteira aleatória"""
+    """Calcula benchmark do Índice Bovespa"""
     try:
-        # Benchmark 1: Índice Bovespa (se disponível nos dados)
+        # Benchmark: Índice Bovespa (se disponível nos dados)
         if '^BVSP' in returns_data.columns:
             retornos_bovespa = returns_data['^BVSP'].tail(dias)
             valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
@@ -424,33 +424,17 @@ def calcular_benchmarks(returns_data, capital_inicial, dias, acoes_selecionadas)
             # Simula Bovespa se não disponível
             retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
             valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
-        
-        # Benchmark 2: Carteira aleatória (pesos iguais)
-        acoes_data = returns_data[[col for col in returns_data.columns if col != '^BVSP']].tail(dias)
-        if len(acoes_data.columns) > 0:
-            # Carteira equiponderada com as ações disponíveis
-            peso_igual = 1 / len(acoes_data.columns)
-            pesos_aleatorios = pd.Series([peso_igual] * len(acoes_data.columns), index=acoes_data.columns)
-            retornos_aleatorio = acoes_data.dot(pesos_aleatorios)
-            valor_aleatorio = pd.Series(capital_inicial * np.cumprod(1 + retornos_aleatorio))
-        else:
-            # Fallback para simulação
-            retornos_aleatorio = np.random.normal(0.0002, 0.015, dias)
-            valor_aleatorio = pd.Series(capital_inicial * np.cumprod(1 + retornos_aleatorio))
-        
+
         return {
-            'bovespa': valor_bovespa,
-            'aleatorio': valor_aleatorio
+            'bovespa': valor_bovespa
         }
-        
+
     except Exception as e:
-        # Em caso de erro, simula benchmarks
+        # Em caso de erro, simula benchmark
         retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
-        retornos_aleatorio = np.random.normal(0.0002, 0.015, dias)
-        
+
         return {
-            'bovespa': pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa)),
-            'aleatorio': pd.Series(capital_inicial * np.cumprod(1 + retornos_aleatorio))
+            'bovespa': pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
         }
 
 def executar_otimizacao_real():
@@ -597,7 +581,6 @@ def executar_otimizacao_real():
             'fitness_hist': fitness_hist,
             'valor_portfolio': valor_portfolio,
             'valor_bovespa': benchmarks['bovespa'],
-            'valor_aleatorio': benchmarks['aleatorio'],
             'datas': pd.date_range(end=datetime.now(), periods=len(valor_portfolio)),
             'geracoes_executadas': geracoes_executadas,
             'convergiu': fitness_final >= params['threshold']
@@ -665,12 +648,9 @@ def executar_otimizacao_simulada():
     retornos_simulados = np.random.normal(retorno_esperado/252, volatilidade/np.sqrt(252), dias)
     valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_simulados))
     
-    # Simula benchmarks
+    # Simula benchmark
     retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
     valor_bovespa = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_bovespa))
-    
-    retornos_aleatorio = np.random.normal(0.0002, 0.015, dias)  # ~5.2% aa, 24% vol
-    valor_aleatorio = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_aleatorio))
     
     return {
         'pesos': pesos,
@@ -684,7 +664,6 @@ def executar_otimizacao_simulada():
         },
         'valor_portfolio': valor_portfolio,
         'valor_bovespa': valor_bovespa,
-        'valor_aleatorio': valor_aleatorio,
         'datas': pd.date_range(end=datetime.now(), periods=dias),
         'geracoes_executadas': geracoes,
         'convergiu': fitness_final >= params['threshold']
@@ -694,10 +673,9 @@ def mostrar_resultados():
     """Exibe os resultados da otimização"""
     st.title("📊 Resultados da Otimização")
     
-    # Executa otimização se ainda não foi executada ou se faltam benchmarks
+    # Executa otimização se ainda não foi executada ou se falta benchmark
     if (st.session_state.resultado_otimizacao is None or 
-        'valor_bovespa' not in st.session_state.resultado_otimizacao or 
-        'valor_aleatorio' not in st.session_state.resultado_otimizacao):
+        'valor_bovespa' not in st.session_state.resultado_otimizacao):
         st.session_state.resultado_otimizacao = executar_otimizacao_real()
     
     resultado = st.session_state.resultado_otimizacao
@@ -723,15 +701,8 @@ def mostrar_resultados():
         # Simula benchmark se não disponível
         valor_final_bovespa = config['capital_inicial'] * 1.05  # ~5% de retorno simulado
     
-    if 'valor_aleatorio' in resultado and len(resultado['valor_aleatorio']) > 0:
-        valor_final_aleatorio = get_last_value(resultado['valor_aleatorio'])
-    else:
-        # Simula carteira aleatória se não disponível
-        valor_final_aleatorio = config['capital_inicial'] * 1.03  # ~3% de retorno simulado
-    
     ganho_otimizado = valor_final_otimizado - config['capital_inicial']
     ganho_bovespa = valor_final_bovespa - config['capital_inicial']
-    ganho_aleatorio = valor_final_aleatorio - config['capital_inicial']
     
     with col1:
         st.metric("Fitness Final", f"{resultado['fitness']:.3f}")
@@ -838,23 +809,12 @@ def mostrar_resultados():
                 ax.plot(resultado['datas'], resultado['valor_bovespa'], 
                        label="Índice Bovespa", linewidth=2, linestyle='--', color='#1f77b4', alpha=0.8)
             else:
-                # Simula dados do Bovespa para o gráfico
+                # Simula benchmark se não disponível
                 dias = len(resultado['datas'])
                 retornos_bovespa_sim = np.random.normal(0.0003, 0.02, dias)
                 valor_bovespa_sim = config['capital_inicial'] * np.cumprod(1 + retornos_bovespa_sim)
                 ax.plot(resultado['datas'], valor_bovespa_sim, 
                        label="Bovespa (Simulado)", linewidth=2, linestyle='--', color='#1f77b4', alpha=0.8)
-            
-            if 'valor_aleatorio' in resultado and len(resultado['valor_aleatorio']) > 0:
-                ax.plot(resultado['datas'], resultado['valor_aleatorio'], 
-                       label="Carteira Equiponderada", linewidth=2, linestyle=':', color='#ff7f0e', alpha=0.8)
-            else:
-                # Simula dados da carteira aleatória para o gráfico
-                dias = len(resultado['datas'])
-                retornos_aleatorio_sim = np.random.normal(0.0002, 0.015, dias)
-                valor_aleatorio_sim = config['capital_inicial'] * np.cumprod(1 + retornos_aleatorio_sim)
-                ax.plot(resultado['datas'], valor_aleatorio_sim, 
-                       label="Carteira Equiponderada (Simulada)", linewidth=2, linestyle=':', color='#ff7f0e', alpha=0.8)
             
             # Linha de referência do capital inicial
             ax.axhline(y=config['capital_inicial'], color='gray', linestyle='-', alpha=0.5, label='Capital Inicial')
@@ -872,62 +832,6 @@ def mostrar_resultados():
             st.pyplot(fig)
             plt.close(fig)
             
-            # Tabela comparativa de performance
-            st.subheader("📊 Resumo Comparativo")
-            
-            retorno_otimizado = (valor_final_otimizado / config['capital_inicial'] - 1) * 100
-            retorno_bovespa = (valor_final_bovespa / config['capital_inicial'] - 1) * 100
-            retorno_aleatorio = (valor_final_aleatorio / config['capital_inicial'] - 1) * 100
-            
-            df_comparacao = pd.DataFrame({
-                'Estratégia': ['Carteira Otimizada (AG)', 'Índice Bovespa', 'Carteira Equiponderada'],
-                'Valor Final (R$)': [valor_final_otimizado, valor_final_bovespa, valor_final_aleatorio],
-                'Retorno (%)': [retorno_otimizado, retorno_bovespa, retorno_aleatorio],
-                'Ganho/Perda (R$)': [ganho_otimizado, ganho_bovespa, ganho_aleatorio]
-            })
-            
-            # Destaca a melhor performance
-            def highlight_best(s):
-                if s.name == 'Retorno (%)':
-                    return ['background-color: lightgreen' if v == s.max() else '' for v in s]
-                elif s.name == 'Ganho/Perda (R$)':
-                    return ['background-color: lightgreen' if v == s.max() else '' for v in s]
-                else:
-                    return ['' for _ in s]
-            
-            st.dataframe(
-                df_comparacao.style.format({
-                    'Valor Final (R$)': 'R$ {:.2f}',
-                    'Retorno (%)': '{:.2f}%',
-                    'Ganho/Perda (R$)': 'R$ {:.2f}'
-                }).apply(highlight_best, axis=0),
-                use_container_width=True
-            )
-            
-        else:
-            st.info("Dados insuficientes para mostrar evolução temporal.")
-        
-        # Métricas de risco expandidas
-        st.subheader("📈 Métricas de Risco e Retorno")
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("Volatilidade", f"{resultado['volatilidade']:.1%}")
-        with col2:
-            st.metric("CVaR (95%)", f"{resultado['cvar']:.3f}")
-        with col3:
-            sharpe_ratio = resultado['retorno_esperado'] / resultado['volatilidade'] if resultado['volatilidade'] > 0 else 0
-            st.metric("Sharpe Ratio", f"{sharpe_ratio:.2f}")
-        with col4:
-            # Máximo drawdown simulado
-            if len(resultado['valor_portfolio']) > 1:
-                valores = resultado['valor_portfolio']
-                peak = valores.expanding().max()
-                drawdown = (valores - peak) / peak
-                max_drawdown = drawdown.min()
-                st.metric("Max Drawdown", f"{max_drawdown:.1%}")
-            else:
-                st.metric("Max Drawdown", "N/A")
-    
     with tab3:
         st.subheader("Evolução do Algoritmo Genético")
         
@@ -1025,6 +929,6 @@ elif st.session_state.etapa_atual == 4:
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: #888;'>
-    🧬 Otimizador de Portfolio | Algoritmo Genético | CVaR Risk Management
+    🧬 Grupo 89 - Otimização de Carteira de Investimentos Utilizando Algoritmo Genético
 </div>
 """, unsafe_allow_html=True)

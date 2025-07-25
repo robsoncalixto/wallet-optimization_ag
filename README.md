@@ -1,10 +1,18 @@
-# Otimização de Portfólio com Algoritmo Genético
+# Grupo 89 - Otimização de Portfólio com Algoritmo Genético
 
 ## Descrição
 
 Este projeto implementa um sistema de otimização de portfólio de investimentos utilizando **Algoritmos Genéticos (AG)** para encontrar a alocação ideal de capital entre diferentes ativos da Bolsa de Valores Brasileira (B3). O objetivo é maximizar o retorno ajustado ao risco, considerando métricas de risco como o **Conditional Value at Risk (CVaR)**.
 
-A aplicação foi desenvolvida como parte do **Tech Challenge da FIAP - Módulo 2**, demonstrando a aplicação prática de metaheurísticas evolutivas em problemas de otimização financeira, especificamente na construção de portfólios eficientes que equilibrem retorno e risco.
+A aplicação foi desenvolvida como parte do **Tech Challenge da FIAP - Módulo 2** pelo **Grupo 89**, demonstrando a aplicação prática de metaheurísticas evolutivas em problemas de otimização financeira, especificamente na construção de portfólios eficientes que equilibrem retorno e risco.
+
+### Características Principais
+
+- 🧬 **Algoritmo Genético** otimizado para portfólios de investimento
+- 📊 **Interface Web Interativa** desenvolvida com Streamlit
+- 📈 **Análise de Risco CVaR** (Conditional Value at Risk)
+- 🎯 **Benchmark com Índice Bovespa** para comparação de performance
+- 📊 **Visualizações Dinâmicas** da evolução e resultados
 
 ## Índice
 
@@ -119,9 +127,6 @@ A interface web oferece:
 ### Exemplo de Configuração no Windows
 
 ```bash
-# Navegar para o diretório do projeto
-cd "c:\Users\r_cal\Documents\Robson Calixto\Pos-tech-FIAP\Modulo 2\wallet-optimization_ag"
-
 # Ativar ambiente virtual
 env\Scripts\activate.bat
 
@@ -181,3 +186,7 @@ elite_percentage = 0.1    # Percentual de elite preservado (10%)
 ## Licença
 
 Este projeto está licenciado sob os termos especificados no arquivo LICENSE.
+
+---
+
+**Desenvolvido pelo Grupo 89 - FIAP Tech Challenge Módulo 2**

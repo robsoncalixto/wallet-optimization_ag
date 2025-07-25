@@ -10,7 +10,6 @@ C = TypeVar('C', bound='Chromossome')
 
 class GeneticAlgorithm(Generic[C]):
     class SelectionType(Enum):
-        ROULETTE = "roulette"
         TOURNAMENT = "tournament"
     
     def __init__(
@@ -20,7 +19,7 @@ class GeneticAlgorithm(Generic[C]):
         max_generations: int,
         mutation_rate: float,
         crossover_rate: float,
-        selection_type: SelectionType = SelectionType.ROULETTE,
+        selection_type: SelectionType = SelectionType.TOURNAMENT,
         fitness_key: Callable = None,
         elitism: bool = True
     ) -> None:
@@ -33,14 +32,6 @@ class GeneticAlgorithm(Generic[C]):
         self._fitness_key: Callable = fitness_key if fitness_key else lambda x: x.fitness()
         self._elitism: bool = elitism
     
-    def _pick_roulette(self, wheel: List[float]) -> Tuple[C, C]:
-        # Ajusta fitness negativos para seleção por roleta
-        min_fitness = min(wheel)
-        if min_fitness < 0:
-            adjusted_wheel = [w - min_fitness + 0.001 for w in wheel]
-        else:
-            adjusted_wheel = wheel
-        return tuple(choices(self._population, weights=adjusted_wheel, k=2))
     
     def _pick_tournament(self, competitors: int = 3) -> Tuple[C, C]:
         # Tournament size fixo e mais adequado
@@ -50,12 +41,7 @@ class GeneticAlgorithm(Generic[C]):
     def _reduce_replace(self) -> None:
         new_population = []
         while len(new_population) < len(self._population):
-            if self._selection_type == self.SelectionType.ROULETTE:
-                parents: Tuple[C, C] = self._pick_roulette(
-                    [self._fitness_key(x) for x in self._population]
-                    )
-            else:
-                parents = self._pick_tournament(3)  # Tournament size fixo
+            parents = self._pick_tournament(3)
             if random() < self._crossover_rate:
                 new_population.extend(parents[0].crossover(parents[1]))
             else:

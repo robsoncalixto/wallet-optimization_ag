@@ -38,8 +38,17 @@ O diretório `/doc` contém documentação técnica detalhada:
 - **`geneticAlgorithm.py`**: Implementação genérica do Algoritmo Genético com suporte a diferentes métodos de seleção, crossover e mutação
 - **`chromossome.py`**: Classe abstrata que define a interface para representação de cromossomos
 - **`portfolio.py`**: Implementação específica de um cromossomo representando um portfólio de investimentos
-- **`dados.py`**: Módulo para coleta e processamento de dados históricos de ações via Yahoo Finance
-- **`app.py`**: Interface web interativa desenvolvida com Streamlit
+- **`dados.py`**: Módulo otimizado para coleta e processamento de dados históricos com sistema de cache inteligente
+- **`app.py`**: Interface web interativa com otimizações de performance e conformidade técnica
+
+### Otimizações Técnicas Implementadas
+
+- **Sistema de Cache**: Implementação de `@st.cache_data` para operações custosas de I/O
+- **Arquitetura de Cache Distribuído**: Função `_baixar_dados_cached()` para otimização do yfinance
+- **Tratamento Robusto de Exceções**: Mensagens específicas e tipificadas para diferentes cenários de erro
+- **Documentação Padronizada**: Docstrings completas seguindo convenções Python
+- **Validação de Dados**: Verificação robusta de arquivos CSV e parâmetros de entrada
+- **Gerenciamento de Memória**: Fechamento adequado de figuras matplotlib
 
 ### Fluxo de Execução
 
@@ -100,11 +109,11 @@ pip install -r requirements.txt
 ```
 
 **Bibliotecas utilizadas:**
-- `pandas`: Manipulação e análise de dados financeiros
-- `numpy`: Computação numérica e operações matriciais
-- `yfinance`: Coleta de dados financeiros da API do Yahoo Finance
-- `matplotlib`: Visualização de gráficos e resultados
-- `streamlit`: Interface web interativa para a aplicação
+- `pandas`: Manipulação e análise de dados financeiros com validação robusta
+- `numpy`: Computação numérica e operações matriciais otimizadas
+- `yfinance`: Coleta de dados financeiros com sistema de cache inteligente
+- `matplotlib`: Visualização de gráficos com gerenciamento adequado de memória
+- `streamlit`: Interface web interativa com cache de operações custosas
 
 ### 4. Execução da Aplicação
 

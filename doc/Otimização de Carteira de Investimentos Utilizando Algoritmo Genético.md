@@ -15,7 +15,8 @@
 2.  [Metodologia](#2-metodologia)
     *   [2.1. Coleta e Pré-processamento dos Dados](#21-coleta-e-pré-processamento-dos-dados)
     *   [2.2. Definição do Portfólio e Métricas de Risco](#22-definição-do-portfólio-e-métricas-de-risco)
-    *   [2.3. O Algoritmo Genético para Otimização](#23-o-algoritmo-genético-para-otimização)
+    *   [2.3. Otimizações Técnicas e Conformidade](#23-otimizações-técnicas-e-conformidade)
+    *   [2.4. O Algoritmo Genético para Otimização](#24-o-algoritmo-genético-para-otimização)
 3.  [Testes e Avaliação](#3-testes-e-avaliação)
     *   [3.1. Configuração do Experimento](#31-configuração-do-experimento)
     *   [3.2. Análise de Convergência](#32-análise-de-convergência)
@@ -96,7 +97,30 @@ A qualidade de um portfólio candidato é avaliada por uma **função de fitness
 
 *   **Fator de Aversão ao Risco:** Um parâmetro (entre 0 e 1) que permite ao investidor definir a importância do risco na otimização. Um valor maior indica que o investidor prefere minimizar o risco, mesmo que isso signifique um retorno menor.
 
-### 2.3. O Algoritmo Genético para Otimização
+### 2.3. Otimizações Técnicas e Conformidade
+
+Durante o desenvolvimento, foram implementadas otimizações técnicas significativas para melhorar a performance e conformidade do sistema:
+
+#### Sistema de Cache Inteligente
+- **Cache de Operações I/O**: Implementação de `@st.cache_data` para carregamento de dados CSV e cálculos de benchmarks
+- **Cache Distribuído**: Função `_baixar_dados_cached()` para otimizar downloads do Yahoo Finance
+- **Hash de Dados**: Sistema de hash para cache eficiente baseado no conteúdo dos dados
+
+#### Tratamento Robusto de Exceções
+- **Validação de Arquivos**: Tratamento específico para `FileNotFoundError`, `EmptyDataError` e `KeyError`
+- **Mensagens Informativas**: Sistema de mensagens tipificadas com emojis para melhor experiência do usuário
+- **Fallbacks Inteligentes**: Mecanismos de recuperação automática em caso de falhas
+
+#### Documentação e Padrões de Código
+- **Docstrings Padronizadas**: Documentação completa em português com Args, Returns e Raises
+- **Convenções Python**: Aderência a snake_case para variáveis e PascalCase para classes
+- **Validação de Parâmetros**: Verificação robusta de dados de entrada
+
+#### Gerenciamento de Memória
+- **Fechamento de Figuras**: Garantia de `plt.close(fig)` após cada gráfico matplotlib
+- **Otimização de Session State**: Uso eficiente do estado da sessão para evitar recálculos
+
+### 2.4. O Algoritmo Genético para Otimização
 
 Para encontrar o portfólio ótimo, foi implementado um Algoritmo Genético com os seguintes componentes:  
 
@@ -151,6 +175,9 @@ A utilização de Algoritmos Genéticos para a otimização de portfólios demon
 A capacidade de explorar um vasto espaço de soluções permite que o algoritmo escape de ótimos locais e encontre soluções de alta qualidade que seriam difíceis de alcançar com otimizadores tradicionais. A natureza estocástica do AG também reflete a incerteza inerente aos mercados financeiros.
 
 No entanto, a qualidade da solução depende da calibração dos hiperparâmetros do AG (tamanho da população, taxas de mutação/crossover). Uma configuração inadequada pode levar à convergência prematura ou a uma exploração ineficiente do espaço de busca. A implementação de taxas de mutação e crossover adaptativas poderia ser uma melhoria futura para refinar ainda mais o processo.
+
+As otimizações técnicas implementadas no projeto demonstraram ser fundamentais para a viabilidade prática da solução. O sistema de cache inteligente reduziu significativamente os tempos de resposta, especialmente para operações de download de dados financeiros. O tratamento robusto de exceções melhorou a confiabilidade do sistema, enquanto a documentação padronizada e o gerenciamento adequado de memória garantiram a manutenção e escalabilidade do código. Essas melhorias técnicas são essenciais para a transição de um protótipo acadêmico para uma aplicação robusta e confiável.
+
 ## 6. Conclusão
 
 Este projeto demonstrou com sucesso a aplicação de Algoritmos Genéticos para resolver o problema complexo de otimização de carteiras de investimentos. A implementação foi capaz de identificar portfólios que otimizam o retorno ajustado ao risco, utilizando o CVaR como uma medida de risco amplamente utilizada no mercado financeiro.

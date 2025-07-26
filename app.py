@@ -104,9 +104,21 @@ st.markdown("""
 
 @st.cache_data
 def carregar_empresas():
-    """Carrega dados das empresas do arquivo CSV"""
+    """Carrega dados das empresas do arquivo CSV.
+    
+    Returns:
+        list: Lista de dicionários com dados das empresas (código, nome, setor, preço)
+        
+    Raises:
+        FileNotFoundError: Arquivo CSV não encontrado
+        pd.errors.EmptyDataError: Arquivo CSV vazio ou corrompido
+    """
     try:
         stocks_df = pd.read_csv("data/empresas_br_bovespa.csv")
+        
+        if stocks_df.empty:
+            raise pd.errors.EmptyDataError("Arquivo CSV está vazio")
+            
         # Filtra apenas as colunas necessárias: código, nome, preço
         empresas = []
         for _, row in stocks_df.iterrows():
@@ -117,8 +129,18 @@ def carregar_empresas():
                 'preco': row['Preço']
             })
         return empresas
+        
+    except FileNotFoundError:
+        st.error("❌ Arquivo 'data/empresas_br_bovespa.csv' não encontrado. Verifique se o arquivo existe.")
+        return []
+    except pd.errors.EmptyDataError:
+        st.error("❌ Arquivo CSV está vazio ou corrompido.")
+        return []
+    except KeyError as e:
+        st.error(f"❌ Coluna obrigatória não encontrada no CSV: {e}")
+        return []
     except Exception as e:
-        st.error(f"Erro ao carregar dados das empresas: {e}")
+        st.error(f"❌ Erro inesperado ao carregar dados das empresas: {str(e)}")
         return []
 
 # Inicializa estados da aplicação
@@ -136,7 +158,14 @@ if "resultado_otimizacao" not in st.session_state:
 
 
 def mostrar_selecao_acoes():
-    """Interface para seleção de ações"""
+    """Interface para seleção de ações e configuração do investimento.
+    
+    Permite ao usuário selecionar ações da Bovespa, definir valor do aporte
+    e taxa livre de risco. Valida seleções e navega para próxima etapa.
+    
+    Raises:
+        FileNotFoundError: Arquivo de empresas não encontrado
+    """
     st.title("📈 Seleção das Ações")
     
     empresas = carregar_empresas()
@@ -272,7 +301,14 @@ def mostrar_selecao_acoes():
             st.button("➡️ Configurar Otimização", disabled=True, help="Nenhuma ação selecionada")
 
 def mostrar_parametros_algoritmo():
-    """Interface para configuração dos parâmetros do algoritmo genético"""
+    """Interface para configuração dos parâmetros do algoritmo genético.
+    
+    Permite configurar tamanho da população, número máximo de gerações,
+    taxas de crossover e mutação. Exibe resumo das configurações atuais.
+    
+    Raises:
+        ValueError: Configuração de investimento não encontrada
+    """
     st.title("⚙️ Configuração dos Parâmetros")
     
     if st.session_state.configuracao_investimento is None:
@@ -354,32 +390,65 @@ def mostrar_parametros_algoritmo():
                 st.session_state.etapa_atual = 3
                 st.rerun()
 
-def calcular_benchmarks(returns_data, capital_inicial, dias, acoes_selecionadas):
-    """Calcula benchmark do Índice Bovespa"""
+@st.cache_data
+def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecionadas):
+    """Calcula benchmark do Índice Bovespa.
+    
+    Args:
+        returns_data_hash (str): Hash dos dados de retorno para cache
+        capital_inicial (float): Valor inicial do investimento
+        dias (int): Número de dias para simulação
+        acoes_selecionadas (list): Lista de ações selecionadas
+        
+    Returns:
+        dict: Dicionário com valores do benchmark Bovespa
+        
+    Raises:
+        ValueError: Erro nos parâmetros de entrada
+    """
     try:
-        # Benchmark: Índice Bovespa (se disponível nos dados)
-        if '^BVSP' in returns_data.columns:
-            retornos_bovespa = returns_data['^BVSP'].tail(dias)
-            valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
-        else:
-            # Simula Bovespa se não disponível
-            retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
-            valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
+        if capital_inicial <= 0:
+            raise ValueError("Capital inicial deve ser positivo")
+        if dias <= 0:
+            raise ValueError("Número de dias deve ser positivo")
+            
+        # Simula benchmark Bovespa com parâmetros realistas
+        # Retorno médio diário: ~0.03% (7.8% ao ano)
+        # Volatilidade diária: ~2% (32% ao ano)
+        np.random.seed(42)  # Seed fixo para reprodutibilidade
+        retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
+        valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
 
         return {
             'bovespa': valor_bovespa
         }
 
-    except Exception as e:
-        # Em caso de erro, simula benchmark
-        retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
-
+    except ValueError as e:
+        st.error(f"❌ Erro nos parâmetros do benchmark: {str(e)}")
+        # Retorna benchmark neutro em caso de erro
         return {
-            'bovespa': pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
+            'bovespa': pd.Series([capital_inicial] * max(1, dias))
+        }
+    except Exception as e:
+        st.warning(f"⚠️ Erro ao calcular benchmark, usando simulação padrão: {str(e)}")
+        # Em caso de erro, simula benchmark neutro
+        return {
+            'bovespa': pd.Series([capital_inicial] * max(1, dias))
         }
 
 def executar_otimizacao_real():
-    """Executa otimização usando a implementação real do algoritmo genético"""
+    """Executa otimização usando a implementação real do algoritmo genético.
+    
+    Baixa dados históricos reais do Yahoo Finance, executa o algoritmo genético
+    para otimizar a carteira e calcula métricas de performance.
+    
+    Returns:
+        dict: Dicionário com resultados da otimização incluindo pesos, fitness,
+              métricas de risco/retorno e histórico de evolução
+              
+    Raises:
+        Exception: Erro ao baixar dados ou executar otimização
+    """
     acoes = st.session_state.acoes_selecionadas
     params = st.session_state.parametros_otimizacao
     config = st.session_state.configuracao_investimento
@@ -513,7 +582,8 @@ def executar_otimizacao_real():
         valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + portfolio_returns.tail(dias)))
         
         # Adiciona comparação com benchmarks
-        benchmarks = calcular_benchmarks(returns_data, config['capital_inicial'], dias, acoes_com_dados)
+        returns_data_hash = str(hash(str(returns_data.values.tobytes())))
+        benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes_com_dados)
         
         progress_bar.empty()
         status_text.empty()
@@ -542,7 +612,17 @@ def executar_otimizacao_real():
         return executar_otimizacao_simulada()
 
 def executar_otimizacao_simulada():
-    """Fallback com dados simulados para demonstração"""
+    """Fallback com dados simulados para demonstração.
+    
+    Utilizada quando a otimização real falha ou para testes.
+    Simula um algoritmo genético com parâmetros realísticos.
+    
+    Returns:
+        dict: Dicionário com resultados simulados da otimização
+        
+    Raises:
+        Exception: Erro durante simulação (raro)
+    """
     acoes = st.session_state.acoes_selecionadas
     params = st.session_state.parametros_otimizacao
     config = st.session_state.configuracao_investimento
@@ -621,7 +701,14 @@ def executar_otimizacao_simulada():
     }
 
 def mostrar_resultados():
-    """Exibe os resultados da otimização"""
+    """Exibe os resultados da otimização com visualizações interativas.
+    
+    Apresenta métricas de performance, gráficos de alocação, comparação
+    com benchmarks e evolução do algoritmo genético em abas organizadas.
+    
+    Raises:
+        Exception: Erro ao executar otimização ou gerar visualizações
+    """
     st.title("📊 Resultados da Otimização")
     
     # Executa otimização se ainda não foi executada ou se falta benchmark

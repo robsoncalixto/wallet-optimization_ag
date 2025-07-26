@@ -133,48 +133,7 @@ if "parametros_otimizacao" not in st.session_state:
 if "resultado_otimizacao" not in st.session_state:
     st.session_state.resultado_otimizacao = None
 
-def mostrar_informacoes_app():
-    """Exibe informações sobre a aplicação"""
-    st.title("🧬 Otimizador de Portfolio com Algoritmo Genético")
-    
-    st.markdown("""
-    ## 📋 Sobre a Aplicação
-    
-    Esta aplicação utiliza **algoritmos genéticos** para encontrar a alocação ótima de um portfólio de investimentos,
-    **maximizando o retorno esperado** enquanto **controla o risco** através da medida CVaR (Conditional Value at Risk).
-    
-    ### 🎯 Objetivo de Otimização
-    **Maximizar:** Função de fitness que equilibra retorno esperado e controle de risco CVaR:
-    ```
-    fitness = (1 - risk_free_rate) × retorno_médio - risk_free_rate × CVaR
-    ```
-    
-    ### 📊 CVaR (Conditional Value at Risk)
-    **CVaR** é uma medida de risco coerente que captura o risco de cauda (tail risk):
-    - Representa a **perda média esperada** nos piores cenários (5% piores casos)
-    - Mais sensível a **eventos extremos** que a variância tradicional
-    - Amplamente aceito por **reguladores financeiros** (Basel III)
-    
-    ### 🧬 Configuração do Algoritmo Genético
-    **Parâmetros Implementados:**
-    - **População:** 10 indivíduos
-    - **Gerações:** 50 máximo  
-    - **Seleção:** Tournament (3 competidores)
-    - **Crossover:** Single-point (50% taxa)
-    - **Mutação:** 20% taxa
-    - **Elitismo:** Ativo (10% melhores preservados)
-    - **Threshold:** Fitness ≥ 13.0
-    
-    ### 🔄 Fluxo da Aplicação
-    1. **Seleção das Ações** - Escolha os ativos da B3
-    2. **Configuração** - Defina valor do aporte
-    3. **Otimização** - Execute o algoritmo genético com CVaR
-    4. **Resultados** - Visualize a alocação ótima e métricas de performance
-    """)
-    
-    if st.button("🚀 Começar Otimização", type="primary", use_container_width=True):
-        st.session_state.etapa_atual = 2
-        st.rerun()
+
 
 def mostrar_selecao_acoes():
     """Interface para seleção de ações"""
@@ -296,7 +255,7 @@ def mostrar_selecao_acoes():
                         'capital_inicial': valor_aporte,
                         'risk_free_rate': risk_free_rate
                     }
-                    st.session_state.etapa_atual = 3
+                    st.session_state.etapa_atual = 2
                     st.rerun()
             else:
                 st.success("✅ Seleção válida!")
@@ -306,7 +265,7 @@ def mostrar_selecao_acoes():
                         'capital_inicial': valor_aporte,
                         'risk_free_rate': risk_free_rate
                     }
-                    st.session_state.etapa_atual = 3
+                    st.session_state.etapa_atual = 2
                     st.rerun()
         else:
             st.info("📝 Selecione pelo menos uma ação para continuar")
@@ -410,7 +369,7 @@ def mostrar_parametros_algoritmo():
                     'mutation_rate': taxa_mutacao,
                     'risk_free_rate': config['risk_free_rate']
                 }
-                st.session_state.etapa_atual = 4
+                st.session_state.etapa_atual = 3
                 st.rerun()
 
 def calcular_benchmarks(returns_data, capital_inicial, dias, acoes_selecionadas):
@@ -880,7 +839,7 @@ def mostrar_resultados():
     with col3:
         if st.button("🔧 Ajustar Parâmetros"):
             st.session_state.resultado_otimizacao = None
-            st.session_state.etapa_atual = 3
+            st.session_state.etapa_atual = 2
             st.rerun()
 
 # ================================
@@ -889,10 +848,10 @@ def mostrar_resultados():
 
 # Sidebar com navegação e progresso
 with st.sidebar:
-    st.title("📊 Navegação")
+    st.title("Navegação")
     
     # Indicador de progresso
-    etapas = ["Início", "Seleção", "Parâmetros", "Resultados"]
+    etapas = ["Seleção", "Parâmetros", "Resultados"]
     etapa_atual = st.session_state.etapa_atual
     
     for i, etapa in enumerate(etapas, 1):
@@ -906,23 +865,21 @@ with st.sidebar:
     st.divider()
     
     # Resumo rápido se em etapas avançadas
-    if etapa_atual > 2 and st.session_state.acoes_selecionadas:
+    if etapa_atual > 1 and st.session_state.acoes_selecionadas:
         st.write("**Resumo:**")
         st.write(f"• {len(st.session_state.acoes_selecionadas)} ações")
         if st.session_state.configuracao_investimento:
             st.write(f"• R$ {st.session_state.configuracao_investimento['capital_inicial']:,.2f}")
     
-    if etapa_atual > 3 and st.session_state.parametros_otimizacao:
+    if etapa_atual > 2 and st.session_state.parametros_otimizacao:
         st.write(f"• {st.session_state.parametros_otimizacao['max_generations']} gerações")
 
 # Roteamento das etapas
 if st.session_state.etapa_atual == 1:
-    mostrar_informacoes_app()
-elif st.session_state.etapa_atual == 2:
     mostrar_selecao_acoes()
-elif st.session_state.etapa_atual == 3:
+elif st.session_state.etapa_atual == 2:
     mostrar_parametros_algoritmo()
-elif st.session_state.etapa_atual == 4:
+elif st.session_state.etapa_atual == 3:
     mostrar_resultados()
 
 # Footer

@@ -1,18 +1,16 @@
-# Grupo 89 - Otimização de Portfólio com Algoritmo Genético
+# Otimização de Portfólio com Algoritmo Genético
+
+> Tech Challenge - Fase 2 - Grupo 89
+**Autores:**  Grupo 89
+- **Araguacy Pereira** - araguacybp@yahoo.com.br
+- **Robson Calixto** - robsoncaliixto@gmail.com
+- **Vinícius Costa** - mcostavini98@gmail.com
 
 ## Descrição
 
 Este projeto implementa um sistema de otimização de portfólio de investimentos utilizando **Algoritmos Genéticos (AG)** para encontrar a alocação ideal de capital entre diferentes ativos da Bolsa de Valores Brasileira (B3). O objetivo é maximizar o retorno ajustado ao risco, considerando métricas de risco como o **Conditional Value at Risk (CVaR)**.
 
 A aplicação foi desenvolvida como parte do **Tech Challenge da FIAP - Módulo 2** pelo **Grupo 89**, demonstrando a aplicação prática de metaheurísticas evolutivas em problemas de otimização financeira, especificamente na construção de portfólios eficientes que equilibrem retorno e risco.
-
-### Características Principais
-
-- 🧬 **Algoritmo Genético** otimizado para portfólios de investimento
-- 📊 **Interface Web Interativa** desenvolvida com Streamlit
-- 📈 **Análise de Risco CVaR** (Conditional Value at Risk)
-- 🎯 **Benchmark com Índice Bovespa** para comparação de performance
-- 📊 **Visualizações Dinâmicas** da evolução e resultados
 
 ## Índice
 
@@ -147,35 +145,7 @@ streamlit run app.py
 - **Frequência**: Diária
 - **Processamento**: Cálculo automático de retornos percentuais
 
-## Parâmetros de Configuração
-
-### Algoritmo Genético
-
-```python
-POPULATION_SIZE = 10       # Tamanho da população
-GENERATIONS = 50           # Número máximo de gerações
-MUTATION_RATE = 0.2        # Taxa de mutação (20%)
-CROSSOVER_RATE = 0.5       # Taxa de crossover (50%)
-RISK_FREE_RATE = 0.5       # Taxa de aversão ao risco
-```
-
-### Análise de Risco
-
-```python
-alpha = 0.95              # Nível de confiança para VaR/CVaR (95%)
-tournament_size = 3       # Tamanho do torneio para seleção
-elite_percentage = 0.1    # Percentual de elite preservado (10%)
-```
-
 ## Resultados e Análise
-
-### Métricas de Saída
-
-- **Fitness Final**: Valor da função objetivo otimizada
-- **Retorno Esperado**: Retorno médio ponderado do portfólio
-- **CVaR**: Conditional Value at Risk (medida de risco em cenários adversos)
-- **Composição**: Distribuição percentual dos pesos por ativo
-- **Tempo de Execução**: Performance computacional do algoritmo
 
 ### Visualizações
 
@@ -186,7 +156,3 @@ elite_percentage = 0.1    # Percentual de elite preservado (10%)
 ## Licença
 
 Este projeto está licenciado sob os termos especificados no arquivo LICENSE.
-
----
-
-**Desenvolvido pelo Grupo 89 - FIAP Tech Challenge Módulo 2**

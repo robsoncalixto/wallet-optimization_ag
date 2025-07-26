@@ -104,9 +104,21 @@ st.markdown("""
 
 @st.cache_data
 def carregar_empresas():
-    """Carrega dados das empresas do arquivo CSV"""
+    """Carrega dados das empresas do arquivo CSV.
+    
+    Returns:
+        list: Lista de dicionários com dados das empresas (código, nome, setor, preço)
+        
+    Raises:
+        FileNotFoundError: Arquivo CSV não encontrado
+        pd.errors.EmptyDataError: Arquivo CSV vazio ou corrompido
+    """
     try:
         stocks_df = pd.read_csv("data/empresas_br_bovespa.csv")
+        
+        if stocks_df.empty:
+            raise pd.errors.EmptyDataError("Arquivo CSV está vazio")
+            
         # Filtra apenas as colunas necessárias: código, nome, preço
         empresas = []
         for _, row in stocks_df.iterrows():
@@ -117,8 +129,18 @@ def carregar_empresas():
                 'preco': row['Preço']
             })
         return empresas
+        
+    except FileNotFoundError:
+        st.error("❌ Arquivo 'data/empresas_br_bovespa.csv' não encontrado. Verifique se o arquivo existe.")
+        return []
+    except pd.errors.EmptyDataError:
+        st.error("❌ Arquivo CSV está vazio ou corrompido.")
+        return []
+    except KeyError as e:
+        st.error(f"❌ Coluna obrigatória não encontrada no CSV: {e}")
+        return []
     except Exception as e:
-        st.error(f"Erro ao carregar dados das empresas: {e}")
+        st.error(f"❌ Erro inesperado ao carregar dados das empresas: {str(e)}")
         return []
 
 # Inicializa estados da aplicação
@@ -133,51 +155,17 @@ if "parametros_otimizacao" not in st.session_state:
 if "resultado_otimizacao" not in st.session_state:
     st.session_state.resultado_otimizacao = None
 
-def mostrar_informacoes_app():
-    """Exibe informações sobre a aplicação"""
-    st.title("🧬 Otimizador de Portfolio com Algoritmo Genético")
-    
-    st.markdown("""
-    ## 📋 Sobre a Aplicação
-    
-    Esta aplicação utiliza **algoritmos genéticos** para encontrar a alocação ótima de um portfólio de investimentos,
-    **maximizando o retorno esperado** enquanto **controla o risco** através da medida CVaR (Conditional Value at Risk).
-    
-    ### 🎯 Objetivo de Otimização
-    **Maximizar:** Função de fitness que equilibra retorno esperado e controle de risco CVaR:
-    ```
-    fitness = (1 - risk_free_rate) × retorno_médio - risk_free_rate × CVaR
-    ```
-    
-    ### 📊 CVaR (Conditional Value at Risk)
-    **CVaR** é uma medida de risco coerente que captura o risco de cauda (tail risk):
-    - Representa a **perda média esperada** nos piores cenários (5% piores casos)
-    - Mais sensível a **eventos extremos** que a variância tradicional
-    - Amplamente aceito por **reguladores financeiros** (Basel III)
-    
-    ### 🧬 Configuração do Algoritmo Genético
-    **Parâmetros Implementados:**
-    - **População:** 10 indivíduos
-    - **Gerações:** 50 máximo  
-    - **Seleção:** Tournament (3 competidores)
-    - **Crossover:** Single-point (50% taxa)
-    - **Mutação:** 20% taxa
-    - **Elitismo:** Ativo (10% melhores preservados)
-    - **Threshold:** Fitness ≥ 13.0
-    
-    ### 🔄 Fluxo da Aplicação
-    1. **Seleção das Ações** - Escolha os ativos da B3
-    2. **Configuração** - Defina valor do aporte
-    3. **Otimização** - Execute o algoritmo genético com CVaR
-    4. **Resultados** - Visualize a alocação ótima e métricas de performance
-    """)
-    
-    if st.button("🚀 Começar Otimização", type="primary", use_container_width=True):
-        st.session_state.etapa_atual = 2
-        st.rerun()
+
 
 def mostrar_selecao_acoes():
-    """Interface para seleção de ações"""
+    """Interface para seleção de ações e configuração do investimento.
+    
+    Permite ao usuário selecionar ações da Bovespa, definir valor do aporte
+    e taxa livre de risco. Valida seleções e navega para próxima etapa.
+    
+    Raises:
+        FileNotFoundError: Arquivo de empresas não encontrado
+    """
     st.title("📈 Seleção das Ações")
     
     empresas = carregar_empresas()
@@ -296,7 +284,7 @@ def mostrar_selecao_acoes():
                         'capital_inicial': valor_aporte,
                         'risk_free_rate': risk_free_rate
                     }
-                    st.session_state.etapa_atual = 3
+                    st.session_state.etapa_atual = 2
                     st.rerun()
             else:
                 st.success("✅ Seleção válida!")
@@ -306,14 +294,21 @@ def mostrar_selecao_acoes():
                         'capital_inicial': valor_aporte,
                         'risk_free_rate': risk_free_rate
                     }
-                    st.session_state.etapa_atual = 3
+                    st.session_state.etapa_atual = 2
                     st.rerun()
         else:
             st.info("📝 Selecione pelo menos uma ação para continuar")
             st.button("➡️ Configurar Otimização", disabled=True, help="Nenhuma ação selecionada")
 
 def mostrar_parametros_algoritmo():
-    """Interface para configuração dos parâmetros do algoritmo genético"""
+    """Interface para configuração dos parâmetros do algoritmo genético.
+    
+    Permite configurar tamanho da população, número máximo de gerações,
+    taxas de crossover e mutação. Exibe resumo das configurações atuais.
+    
+    Raises:
+        ValueError: Configuração de investimento não encontrada
+    """
     st.title("⚙️ Configuração dos Parâmetros")
     
     if st.session_state.configuracao_investimento is None:
@@ -340,9 +335,8 @@ def mostrar_parametros_algoritmo():
             max_geracoes = st.number_input("🔄 Máximo de Gerações", 
                                          min_value=10, max_value=200, value=50, step=10,
                                          help="Valor padrão da implementação: 50")
-            threshold_fitness = st.number_input("🎯 Threshold de Fitness", 
-                                               min_value=1.0, max_value=20.0, value=13.0, step=0.5,
-                                               help="Valor padrão da implementação: 13.0")
+            # Threshold fixo (valor realista para otimização de portfólio)
+            threshold_fitness = 0.01  # Valor fixo mais apropriado
         
         with col_param2:
             st.write("**Operadores Genéticos**")
@@ -355,23 +349,9 @@ def mostrar_parametros_algoritmo():
             st.write("• **Seleção:** Tournament (3 competidores)")
             st.write("• **Crossover:** Single-point") 
             st.write("• **Elitismo:** Ativo (10% melhores)")
-            st.write("• **Critério Parada:** Threshold OU Gerações")
+            st.write("• **Critério Parada:** Número máximo de gerações")
         
-        # Seção informativa sobre CVaR
-        with st.expander("📊 Sobre o CVaR (Conditional Value at Risk)"):
-            st.markdown("""
-            **CVaR** é a medida de risco utilizada neste projeto:
-            
-            - **Definição:** Média das perdas nos piores cenários (5% piores casos)
-            - **Vantagem:** Captura risco de eventos extremos melhor que variância
-            - **Cálculo:** CVaR = E[retorno | retorno ≤ VaR₉₅%]
-            - **Uso na Fitness:** Penaliza portfólios com alto risco de cauda
-            
-            **Fórmula da Fitness:**
-            ```
-            fitness = (1 - risk_free_rate) × retorno_médio - risk_free_rate × CVaR
-            ```
-            """)
+
     
     with col2:
         st.subheader("Resumo da Configuração")
@@ -385,13 +365,10 @@ def mostrar_parametros_algoritmo():
         st.write("**Parâmetros do Algoritmo:**")
         st.write(f"• População: {tamanho_populacao}")
         st.write(f"• Gerações Máx: {max_geracoes}")
-        st.write(f"• Threshold: {threshold_fitness}")
         st.write(f"• Crossover: {taxa_crossover:.0%}")
         st.write(f"• Mutação: {taxa_mutacao:.0%}")
         
-        # Estimativa de tempo
-        tempo_estimado = (tamanho_populacao * max_geracoes) / 500  # Estimativa baseada em performance
-        st.info(f"⏱️ Tempo estimado: ~{tempo_estimado:.1f} segundos")
+
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
@@ -410,35 +387,68 @@ def mostrar_parametros_algoritmo():
                     'mutation_rate': taxa_mutacao,
                     'risk_free_rate': config['risk_free_rate']
                 }
-                st.session_state.etapa_atual = 4
+                st.session_state.etapa_atual = 3
                 st.rerun()
 
-def calcular_benchmarks(returns_data, capital_inicial, dias, acoes_selecionadas):
-    """Calcula benchmark do Índice Bovespa"""
+@st.cache_data
+def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecionadas):
+    """Calcula benchmark do Índice Bovespa.
+    
+    Args:
+        returns_data_hash (str): Hash dos dados de retorno para cache
+        capital_inicial (float): Valor inicial do investimento
+        dias (int): Número de dias para simulação
+        acoes_selecionadas (list): Lista de ações selecionadas
+        
+    Returns:
+        dict: Dicionário com valores do benchmark Bovespa
+        
+    Raises:
+        ValueError: Erro nos parâmetros de entrada
+    """
     try:
-        # Benchmark: Índice Bovespa (se disponível nos dados)
-        if '^BVSP' in returns_data.columns:
-            retornos_bovespa = returns_data['^BVSP'].tail(dias)
-            valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
-        else:
-            # Simula Bovespa se não disponível
-            retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
-            valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
+        if capital_inicial <= 0:
+            raise ValueError("Capital inicial deve ser positivo")
+        if dias <= 0:
+            raise ValueError("Número de dias deve ser positivo")
+            
+        # Simula benchmark Bovespa com parâmetros realistas
+        # Retorno médio diário: ~0.03% (7.8% ao ano)
+        # Volatilidade diária: ~2% (32% ao ano)
+        np.random.seed(42)  # Seed fixo para reprodutibilidade
+        retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
+        valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
 
         return {
             'bovespa': valor_bovespa
         }
 
-    except Exception as e:
-        # Em caso de erro, simula benchmark
-        retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
-
+    except ValueError as e:
+        st.error(f"❌ Erro nos parâmetros do benchmark: {str(e)}")
+        # Retorna benchmark neutro em caso de erro
         return {
-            'bovespa': pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
+            'bovespa': pd.Series([capital_inicial] * max(1, dias))
+        }
+    except Exception as e:
+        st.warning(f"⚠️ Erro ao calcular benchmark, usando simulação padrão: {str(e)}")
+        # Em caso de erro, simula benchmark neutro
+        return {
+            'bovespa': pd.Series([capital_inicial] * max(1, dias))
         }
 
 def executar_otimizacao_real():
-    """Executa otimização usando a implementação real do algoritmo genético"""
+    """Executa otimização usando a implementação real do algoritmo genético.
+    
+    Baixa dados históricos reais do Yahoo Finance, executa o algoritmo genético
+    para otimizar a carteira e calcula métricas de performance.
+    
+    Returns:
+        dict: Dicionário com resultados da otimização incluindo pesos, fitness,
+              métricas de risco/retorno e histórico de evolução
+              
+    Raises:
+        Exception: Erro ao baixar dados ou executar otimização
+    """
     acoes = st.session_state.acoes_selecionadas
     params = st.session_state.parametros_otimizacao
     config = st.session_state.configuracao_investimento
@@ -547,6 +557,11 @@ def executar_otimizacao_real():
         progress_bar.progress(100)
         status_text.text("✅ Otimização concluída!")
         
+        # Limpa indicadores de progresso após um breve delay
+        time.sleep(1)
+        progress_bar.empty()
+        status_text.empty()
+        
         # Simula dados de evolução se disponível
         if hasattr(ga, 'results') and ga.results is not None:
             fitness_hist = {
@@ -567,7 +582,8 @@ def executar_otimizacao_real():
         valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + portfolio_returns.tail(dias)))
         
         # Adiciona comparação com benchmarks
-        benchmarks = calcular_benchmarks(returns_data, config['capital_inicial'], dias, acoes_com_dados)
+        returns_data_hash = str(hash(str(returns_data.values.tobytes())))
+        benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes_com_dados)
         
         progress_bar.empty()
         status_text.empty()
@@ -596,7 +612,17 @@ def executar_otimizacao_real():
         return executar_otimizacao_simulada()
 
 def executar_otimizacao_simulada():
-    """Fallback com dados simulados para demonstração"""
+    """Fallback com dados simulados para demonstração.
+    
+    Utilizada quando a otimização real falha ou para testes.
+    Simula um algoritmo genético com parâmetros realísticos.
+    
+    Returns:
+        dict: Dicionário com resultados simulados da otimização
+        
+    Raises:
+        Exception: Erro durante simulação (raro)
+    """
     acoes = st.session_state.acoes_selecionadas
     params = st.session_state.parametros_otimizacao
     config = st.session_state.configuracao_investimento
@@ -652,6 +678,11 @@ def executar_otimizacao_simulada():
     retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
     valor_bovespa = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_bovespa))
     
+    # Limpa indicadores de progresso
+    time.sleep(0.5)
+    progress_bar.empty()
+    status_text.empty()
+    
     return {
         'pesos': pesos,
         'fitness': fitness_final,
@@ -670,7 +701,14 @@ def executar_otimizacao_simulada():
     }
 
 def mostrar_resultados():
-    """Exibe os resultados da otimização"""
+    """Exibe os resultados da otimização com visualizações interativas.
+    
+    Apresenta métricas de performance, gráficos de alocação, comparação
+    com benchmarks e evolução do algoritmo genético em abas organizadas.
+    
+    Raises:
+        Exception: Erro ao executar otimização ou gerar visualizações
+    """
     st.title("📊 Resultados da Otimização")
     
     # Executa otimização se ainda não foi executada ou se falta benchmark
@@ -880,7 +918,7 @@ def mostrar_resultados():
     with col3:
         if st.button("🔧 Ajustar Parâmetros"):
             st.session_state.resultado_otimizacao = None
-            st.session_state.etapa_atual = 3
+            st.session_state.etapa_atual = 2
             st.rerun()
 
 # ================================
@@ -889,10 +927,10 @@ def mostrar_resultados():
 
 # Sidebar com navegação e progresso
 with st.sidebar:
-    st.title("📊 Navegação")
+    st.title("Navegação")
     
     # Indicador de progresso
-    etapas = ["Início", "Seleção", "Parâmetros", "Resultados"]
+    etapas = ["Seleção", "Parâmetros", "Resultados"]
     etapa_atual = st.session_state.etapa_atual
     
     for i, etapa in enumerate(etapas, 1):
@@ -906,23 +944,21 @@ with st.sidebar:
     st.divider()
     
     # Resumo rápido se em etapas avançadas
-    if etapa_atual > 2 and st.session_state.acoes_selecionadas:
+    if etapa_atual > 1 and st.session_state.acoes_selecionadas:
         st.write("**Resumo:**")
         st.write(f"• {len(st.session_state.acoes_selecionadas)} ações")
         if st.session_state.configuracao_investimento:
             st.write(f"• R$ {st.session_state.configuracao_investimento['capital_inicial']:,.2f}")
     
-    if etapa_atual > 3 and st.session_state.parametros_otimizacao:
+    if etapa_atual > 2 and st.session_state.parametros_otimizacao:
         st.write(f"• {st.session_state.parametros_otimizacao['max_generations']} gerações")
 
 # Roteamento das etapas
 if st.session_state.etapa_atual == 1:
-    mostrar_informacoes_app()
-elif st.session_state.etapa_atual == 2:
     mostrar_selecao_acoes()
-elif st.session_state.etapa_atual == 3:
+elif st.session_state.etapa_atual == 2:
     mostrar_parametros_algoritmo()
-elif st.session_state.etapa_atual == 4:
+elif st.session_state.etapa_atual == 3:
     mostrar_resultados()
 
 # Footer

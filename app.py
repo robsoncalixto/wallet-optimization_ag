@@ -299,9 +299,8 @@ def mostrar_parametros_algoritmo():
             max_geracoes = st.number_input("🔄 Máximo de Gerações", 
                                          min_value=10, max_value=200, value=50, step=10,
                                          help="Valor padrão da implementação: 50")
-            threshold_fitness = st.number_input("🎯 Threshold de Fitness", 
-                                               min_value=1.0, max_value=20.0, value=13.0, step=0.5,
-                                               help="Valor padrão da implementação: 13.0")
+            # Threshold fixo (valor realista para otimização de portfólio)
+            threshold_fitness = 0.01  # Valor fixo mais apropriado
         
         with col_param2:
             st.write("**Operadores Genéticos**")
@@ -314,23 +313,9 @@ def mostrar_parametros_algoritmo():
             st.write("• **Seleção:** Tournament (3 competidores)")
             st.write("• **Crossover:** Single-point") 
             st.write("• **Elitismo:** Ativo (10% melhores)")
-            st.write("• **Critério Parada:** Threshold OU Gerações")
+            st.write("• **Critério Parada:** Número máximo de gerações")
         
-        # Seção informativa sobre CVaR
-        with st.expander("📊 Sobre o CVaR (Conditional Value at Risk)"):
-            st.markdown("""
-            **CVaR** é a medida de risco utilizada neste projeto:
-            
-            - **Definição:** Média das perdas nos piores cenários (5% piores casos)
-            - **Vantagem:** Captura risco de eventos extremos melhor que variância
-            - **Cálculo:** CVaR = E[retorno | retorno ≤ VaR₉₅%]
-            - **Uso na Fitness:** Penaliza portfólios com alto risco de cauda
-            
-            **Fórmula da Fitness:**
-            ```
-            fitness = (1 - risk_free_rate) × retorno_médio - risk_free_rate × CVaR
-            ```
-            """)
+
     
     with col2:
         st.subheader("Resumo da Configuração")
@@ -344,13 +329,10 @@ def mostrar_parametros_algoritmo():
         st.write("**Parâmetros do Algoritmo:**")
         st.write(f"• População: {tamanho_populacao}")
         st.write(f"• Gerações Máx: {max_geracoes}")
-        st.write(f"• Threshold: {threshold_fitness}")
         st.write(f"• Crossover: {taxa_crossover:.0%}")
         st.write(f"• Mutação: {taxa_mutacao:.0%}")
         
-        # Estimativa de tempo
-        tempo_estimado = (tamanho_populacao * max_geracoes) / 500  # Estimativa baseada em performance
-        st.info(f"⏱️ Tempo estimado: ~{tempo_estimado:.1f} segundos")
+
         
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
@@ -506,6 +488,11 @@ def executar_otimizacao_real():
         progress_bar.progress(100)
         status_text.text("✅ Otimização concluída!")
         
+        # Limpa indicadores de progresso após um breve delay
+        time.sleep(1)
+        progress_bar.empty()
+        status_text.empty()
+        
         # Simula dados de evolução se disponível
         if hasattr(ga, 'results') and ga.results is not None:
             fitness_hist = {
@@ -610,6 +597,11 @@ def executar_otimizacao_simulada():
     # Simula benchmark
     retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
     valor_bovespa = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_bovespa))
+    
+    # Limpa indicadores de progresso
+    time.sleep(0.5)
+    progress_bar.empty()
+    status_text.empty()
     
     return {
         'pesos': pesos,

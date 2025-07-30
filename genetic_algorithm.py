@@ -1,3 +1,10 @@
+"""
+Módulo contendo a implementação do algoritmo genético.
+
+Esta classe implementa um algoritmo genético genérico que pode ser usado
+para otimizar qualquer tipo de cromossomo.
+"""
+
 from __future__ import annotations
 from typing import TypeVar, Generic, List, Callable, Tuple
 from statistics import mean
@@ -6,10 +13,18 @@ from enum import Enum
 import matplotlib.pyplot as plt
 import pandas as pd
 
-C = TypeVar('C', bound='Chromossome')
+T = TypeVar('T', bound='Chromosome')
 
-class GeneticAlgorithm(Generic[C]):
+class GeneticAlgorithm(Generic[T]):
+    """
+    Implementação de um algoritmo genético genérico.
+    
+    Esta classe pode ser usada para otimizar qualquer tipo de cromossomo
+    que implemente a interface Chromosome.
+    """
+    
     class SelectionType(Enum):
+        """Tipos de seleção disponíveis no algoritmo genético."""
         TOURNAMENT = "tournament"
     
     def __init__(
@@ -23,6 +38,19 @@ class GeneticAlgorithm(Generic[C]):
         fitness_key: Callable = None,
         elitism: bool = True
     ) -> None:
+        """
+        Inicializa o algoritmo genético.
+        
+        Args:
+            population: População inicial de cromossomos
+            threshold: Limiar de aptidão para parada antecipada
+            max_generations: Número máximo de gerações
+            mutation_rate: Taxa de mutação
+            crossover_rate: Taxa de cruzamento
+            selection_type: Tipo de seleção a ser usado
+            fitness_key: Função para calcular aptidão
+            elitism: Se deve aplicar elitismo
+        """
         self._population: List[C] = population
         self._threshold: float = threshold
         self._max_generations: int = max_generations
@@ -32,13 +60,21 @@ class GeneticAlgorithm(Generic[C]):
         self._fitness_key: Callable = fitness_key if fitness_key else lambda x: x.fitness()
         self._elitism: bool = elitism
     
-    
     def _pick_tournament(self, competitors: int = 3) -> Tuple[C, C]:
-        # Tournament size fixo e mais adequado
+        """
+        Seleção por torneio.
+        
+        Args:
+            competitors: Número de competidores no torneio
+            
+        Returns:
+            Tuple[C, C]: Dois cromossomos selecionados
+        """
         participants = choices(self._population, k=competitors)
         return tuple(sorted(participants, key=self._fitness_key, reverse=True)[:2])
 
     def _reduce_replace(self) -> None:
+        """Substitui a população atual por uma nova geração."""
         new_population = []
         while len(new_population) < len(self._population):
             parents = self._pick_tournament(3)
@@ -51,7 +87,15 @@ class GeneticAlgorithm(Generic[C]):
         self._population = new_population
 
     def _apply_elitism(self, new_population: List[C]) -> List[C]:
-        """Preserva os melhores indivídduos da população anterior"""
+        """
+        Preserva os melhores indivíduos da população anterior.
+        
+        Args:
+            new_population: Nova população gerada
+            
+        Returns:
+            List[C]: População com elitismo aplicado
+        """
         if not self._elitism:
             return new_population
         
@@ -67,31 +111,44 @@ class GeneticAlgorithm(Generic[C]):
         return elite + new_population[:len(self._population) - elite_size]
     
     def _mutation(self) -> None:
-        for chromossome in self._population:
+        """Aplica mutação na população."""
+        for chromosome in self._population:
             if random() < self._mutation_rate:
-                chromossome.mutate()
+                chromosome.mutate()
     
     def run(self) -> C:
+        """
+        Executa o algoritmo genético.
+        
+        Returns:
+            C: Melhor cromossomo encontrado
+        """
         best: C = max(self._population, key=self._fitness_key)
         gens = []
         best_fitness_list = []
         mean_fitness_list = []
+        
         for generation in range(self._max_generations):
             current_best_fitness = self._fitness_key(best)
             if current_best_fitness >= self._threshold:
                 return best
+                
             current_mean_fitness = mean(map(self._fitness_key, self._population))
             gens.append(generation)
             best_fitness_list.append(current_best_fitness)
             mean_fitness_list.append(current_mean_fitness)
+            
             print(f"Generation: {generation}, Best Fitness: {current_best_fitness}, Mean Fitness: {current_mean_fitness}")
+            
             self._reduce_replace()
             if self._elitism:
                 self._population = self._apply_elitism(self._population)
             self._mutation()
+            
             highest: C = max(self._population, key=self._fitness_key)
             if self._fitness_key(highest) > self._fitness_key(best):
                 best = highest
+                
         self.results = pd.DataFrame({
             "gens": gens,
             "best_fitness": best_fitness_list,
@@ -100,6 +157,7 @@ class GeneticAlgorithm(Generic[C]):
         return best
     
     def show_results(self) -> None:
+        """Exibe os resultados do algoritmo genético em um gráfico."""
         if hasattr(self, 'results'):
             df = pd.DataFrame(self.results)
             plt.figure(figsize=(10, 6))

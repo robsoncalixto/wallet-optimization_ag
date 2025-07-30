@@ -28,10 +28,10 @@ O diretório `/doc` contém documentação técnica detalhada:
 
 ### Componentes Principais
 
-- **`geneticAlgorithm.py`**: Implementação genérica do Algoritmo Genético com suporte a diferentes métodos de seleção, crossover e mutação
-- **`chromossome.py`**: Classe abstrata que define a interface para representação de cromossomos
+- **`genetic_algorithm.py`**: Implementação genérica do Algoritmo Genético com suporte a diferentes métodos de seleção, crossover e mutação
+- **`chromosome.py`**: Classe abstrata que define a interface para representação de cromossomos
 - **`portfolio.py`**: Implementação específica de um cromossomo representando um portfólio de investimentos
-- **`dados.py`**: Módulo otimizado para coleta e processamento de dados históricos com sistema de cache inteligente
+- **`data_collector.py`**: Módulo otimizado para coleta e processamento de dados históricos com sistema de cache inteligente
 - **`app.py`**: Interface web interativa com otimizações de performance e conformidade técnica
 
 ### Fluxo de Execução

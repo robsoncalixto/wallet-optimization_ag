@@ -3,26 +3,81 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Agg')
-
-# Configuração para evitar warnings de emojis em matplotlib
+from data_collector import DataCollector
+from portfolio import Portfolio
+from genetic_algorithm import GeneticAlgorithm
+from datetime import datetime, timedelta
 import warnings
-warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
+import yfinance as yf
+import time
 
-# Configuração adicional do matplotlib para fontes
+matplotlib.use('Agg')
+warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
 matplotlib.rcParams['font.family'] = 'sans-serif'
 matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sans', 'sans-serif']
-from datetime import datetime, timedelta
-import time
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'data')))
-from dados import ColetorDados, _baixar_dados_cached
-from portfolio import Portfolio
-from geneticAlgorithm import GeneticAlgorithm
 
 st.set_page_config(page_title="Otimizador de Portfolio", layout="wide", initial_sidebar_state="expanded")
+
+# Estrutura de dados dos perfis de investimento
+PERFIS_INVESTIMENTO = {
+    'Conservador': {
+        'descricao': 'Perfil focado em preservação de capital com menor volatilidade',
+        'caracteristicas': [
+            'Prioriza setores defensivos (Utilities, Saúde, Consumo Básico)',
+            'Menor exposição a setores cíclicos',
+            'Parâmetros do algoritmo ajustados para estabilidade'
+        ],
+        'parametros': {
+            'taxa_livre_risco': 0.1075,
+            'geracoes': 30,
+            'tamanho_populacao': 50,
+            'taxa_mutacao': 0.15,
+            'taxa_crossover': 0.7,
+            'threshold_fitness': 0.15,
+            'max_ativos': 12,
+            'min_ativos': 8
+        },
+        'cor': '#28a745'
+    },
+    'Moderado': {
+        'descricao': 'Perfil equilibrado entre risco e retorno',
+        'caracteristicas': [
+            'Diversificação balanceada entre setores',
+            'Combinação de ativos defensivos e crescimento',
+            'Parâmetros moderados para exploração e estabilidade'
+        ],
+        'parametros': {
+            'taxa_livre_risco': 0.1075,
+            'geracoes': 40,
+            'tamanho_populacao': 75,
+            'taxa_mutacao': 0.2,
+            'taxa_crossover': 0.8,
+            'threshold_fitness': 0.12,
+            'max_ativos': 15,
+            'min_ativos': 10
+        },
+        'cor': '#ffc107'
+    },
+    'Arrojado': {
+        'descricao': 'Perfil agressivo focado em maximização de retornos',
+        'caracteristicas': [
+            'Maior exposição a setores de crescimento e cíclicos',
+            'Aceita maior volatilidade em busca de retornos superiores',
+            'Parâmetros otimizados para exploração máxima'
+        ],
+        'parametros': {
+            'taxa_livre_risco': 0.1075,
+            'geracoes': 50,
+            'tamanho_populacao': 100,
+            'taxa_mutacao': 0.25,
+            'taxa_crossover': 0.85,
+            'threshold_fitness': 0.10,
+            'max_ativos': 18,
+            'min_ativos': 12
+        },
+        'cor': '#dc3545'
+    }
+}
 
 @st.cache_data
 def _baixar_dados_ibovespa_cached(start_date, end_date):
@@ -39,7 +94,6 @@ def _baixar_dados_ibovespa_cached(start_date, end_date):
         Exception: Erro ao baixar dados do yfinance
     """
     try:
-        import yfinance as yf
         data = yf.download("^BVSP", start=start_date, end=end_date, auto_adjust=True)
         return data
     except Exception as e:
@@ -97,6 +151,8 @@ if "parametros_otimizacao" not in st.session_state:
     st.session_state.parametros_otimizacao = None
 if "resultado_otimizacao" not in st.session_state:
     st.session_state.resultado_otimizacao = None
+if "executando_otimizacao" not in st.session_state:
+    st.session_state.executando_otimizacao = False
 
 
 
@@ -109,7 +165,7 @@ def mostrar_selecao_acoes():
     Raises:
         FileNotFoundError: Arquivo de empresas não encontrado
     """
-    st.title("📈 Seleção das Ações")
+    st.title("Seleção das Ações")
     
     empresas = carregar_empresas()
     
@@ -125,18 +181,32 @@ def mostrar_selecao_acoes():
         col_config1, col_config2 = st.columns(2)
         
         with col_config1:
-            valor_aporte = st.number_input("💰 Valor do Aporte (R$)", min_value=1000, value=10000, step=1000)
+            valor_aporte = st.number_input("Valor do Aporte (R$)", min_value=1000, value=10000, step=1000)
         
         with col_config2:
-            risk_free_rate = st.slider("📊 Taxa Livre de Risco", 0.01, 0.10, 0.05, 0.01, 
-                                     help="Taxa de referência para cálculo do fitness (Selic anual)")
+            # Inicializar perfil selecionado se não existir
+            if 'perfil_selecionado' not in st.session_state:
+                st.session_state.perfil_selecionado = 'Moderado'
+            
+            perfil_selecionado = st.selectbox(
+                "Perfil de Investimento",
+                options=list(PERFIS_INVESTIMENTO.keys()),
+                index=list(PERFIS_INVESTIMENTO.keys()).index(st.session_state.perfil_selecionado),
+                help="Cada perfil possui parâmetros otimizados do algoritmo genético"
+            )
+            
+            # Atualizar session state
+            st.session_state.perfil_selecionado = perfil_selecionado
+            
+            # Obter taxa livre de risco do perfil selecionado
+            risk_free_rate = PERFIS_INVESTIMENTO[perfil_selecionado]['parametros']['taxa_livre_risco']
         
         st.subheader("Filtros e Seleção de Ações")
         
         # Filtro por setor (remove valores NaN/None)
         setores_unicos = sorted(list(set(emp['setor'] for emp in empresas if emp['setor'] and not pd.isna(emp['setor']))))
         setores_disponiveis = ['Todos os Setores'] + setores_unicos
-        setor_selecionado = st.selectbox("🏢 Filtrar por Setor", setores_disponiveis)
+        setor_selecionado = st.selectbox("Filtrar por Setor", setores_disponiveis)
         
         # Aplicar filtro por setor
         if setor_selecionado == 'Todos os Setores':
@@ -244,15 +314,15 @@ def mostrar_selecao_acoes():
             st.button("➡️ Configurar Otimização", disabled=True, help="Nenhuma ação selecionada")
 
 def mostrar_parametros_algoritmo():
-    """Interface para configuração dos parâmetros do algoritmo genético.
+    """Interface para visualização dos parâmetros do algoritmo genético.
     
-    Permite configurar tamanho da população, número máximo de gerações,
-    taxas de crossover e mutação. Exibe resumo das configurações atuais.
+    Exibe os parâmetros configurados automaticamente baseados no perfil
+    de investimento selecionado na etapa anterior.
     
     Raises:
         ValueError: Configuração de investimento não encontrada
     """
-    st.title("⚙️ Configuração dos Parâmetros")
+    st.title("Parâmetros do Algoritmo Genético")
     
     if st.session_state.configuracao_investimento is None:
         st.error("Configuração de investimento não encontrada. Volte à etapa anterior.")
@@ -260,78 +330,118 @@ def mostrar_parametros_algoritmo():
     
     config = st.session_state.configuracao_investimento
     
+    # Verificar se perfil foi selecionado
+    if 'perfil_selecionado' not in st.session_state:
+        st.error("Perfil de investimento não selecionado. Volte à etapa anterior.")
+        return
+    
+    perfil_atual = PERFIS_INVESTIMENTO[st.session_state.perfil_selecionado]
+    
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.subheader("Parâmetros do Algoritmo Genético")
+        st.subheader("Parâmetros Configurados Automaticamente")
         
-        st.info("⚙️ **Configuração Atual do Sistema:** Os parâmetros abaixo refletem a implementação real do algoritmo.")
+        st.info("⚙️ **Configuração Automática:** Os parâmetros abaixo foram definidos automaticamente baseados no seu perfil de investimento.")
         
         col_param1, col_param2 = st.columns(2)
         
         with col_param1:
             st.write("**Parâmetros da População**")
-            # Valores fixos baseados na implementação atual
-            tamanho_populacao = st.number_input("👥 Tamanho da População", 
-                                               min_value=5, max_value=50, value=10, step=5,
-                                               help="Valor padrão da implementação: 10")
-            max_geracoes = st.number_input("🔄 Máximo de Gerações", 
-                                         min_value=10, max_value=200, value=50, step=10,
-                                         help="Valor padrão da implementação: 50")
-            # Threshold fixo (valor realista para otimização de portfólio)
-            threshold_fitness = 0.01  # Valor fixo mais apropriado
+            
+            # Exibir parâmetros como métricas (somente leitura)
+            st.metric(
+                label="👥 Tamanho da População",
+                value=perfil_atual['parametros']['tamanho_populacao'],
+                help="Número de indivíduos na população do algoritmo genético"
+            )
+            
+            st.metric(
+                label="🔄 Máximo de Gerações",
+                value=perfil_atual['parametros']['geracoes'],
+                help="Número máximo de iterações do algoritmo"
+            )
+            
+            st.metric(
+                label="🎯 Threshold Fitness",
+                value=f"{perfil_atual['parametros']['threshold_fitness']:.2f}",
+                help="Valor mínimo de fitness para parada antecipada"
+            )
         
         with col_param2:
             st.write("**Operadores Genéticos**")
-            taxa_crossover = st.slider("🧬 Taxa de Crossover", 0.3, 0.9, 0.5, 0.1,
-                                      help="Valor padrão da implementação: 0.5 (50%)")
-            taxa_mutacao = st.slider("🎲 Taxa de Mutação", 0.1, 0.5, 0.2, 0.05,
-                                    help="Valor padrão da implementação: 0.2 (20%)")
             
-            st.write("**Configurações Fixas:**")
-            st.write("• **Seleção:** Tournament (3 competidores)")
-            st.write("• **Crossover:** Single-point") 
-            st.write("• **Elitismo:** Ativo (10% melhores)")
-            st.write("• **Critério Parada:** Número máximo de gerações")
+            st.metric(
+                label="🧬 Taxa de Crossover",
+                value=f"{perfil_atual['parametros']['taxa_crossover']:.0%}",
+                help="Probabilidade de cruzamento entre indivíduos"
+            )
+            
+            st.metric(
+                label="🎲 Taxa de Mutação",
+                value=f"{perfil_atual['parametros']['taxa_mutacao']:.0%}",
+                help="Probabilidade de mutação dos genes"
+            )
+            
+            st.metric(
+                label="📊 Taxa Livre de Risco",
+                value=f"{perfil_atual['parametros']['taxa_livre_risco']:.2%}",
+                help="Taxa de referência para cálculo do índice de Sharpe"
+            )
         
-
+        # Configurações fixas do algoritmo
+        st.subheader("Configurações Fixas do Algoritmo")
+        
+        config_cols = st.columns(2)
+        
+        with config_cols[0]:
+            st.write("• **Método de Seleção:** Tournament (3 competidores)")
+            st.write("• **Tipo de Crossover:** Single-point")
+            
+        with config_cols[1]:
+            st.write("• **Elitismo:** Ativo (10% melhores preservados)")
+            st.write("• **Critério de Parada:** Threshold ou gerações máximas")
     
     with col2:
         st.subheader("Resumo da Configuração")
         
+        st.metric("Perfil de Investimento", st.session_state.perfil_selecionado)
         st.metric("Ações Selecionadas", len(st.session_state.acoes_selecionadas))
         st.metric("Valor do Aporte", f"R$ {config['capital_inicial']:,.2f}")
-        st.metric("Taxa Livre de Risco", f"{config['risk_free_rate']:.1%}")
-        
-        st.divider()
-        
-        st.write("**Parâmetros do Algoritmo:**")
-        st.write(f"• População: {tamanho_populacao}")
-        st.write(f"• Gerações Máx: {max_geracoes}")
-        st.write(f"• Crossover: {taxa_crossover:.0%}")
-        st.write(f"• Mutação: {taxa_mutacao:.0%}")
-        
-
-        
+    
+    st.divider()
+    
+    # Verificar se otimização está sendo executada
+    executando_otimizacao = st.session_state.get('executando_otimizacao', False)
+    
+    if not executando_otimizacao:
+        # Botões de navegação (só aparecem quando não está executando)
         col_btn1, col_btn2 = st.columns(2)
         with col_btn1:
             if st.button("⬅️ Voltar"):
-                st.session_state.etapa_atual = 2
+                st.session_state.etapa_atual = 1
                 st.rerun()
         
         with col_btn2:
             if st.button("🚀 Executar Otimização", type="primary"):
-
+                # Configurar parâmetros baseados no perfil selecionado
                 st.session_state.parametros_otimizacao = {
-                    'population_size': tamanho_populacao,
-                    'max_generations': max_geracoes,
-                    'threshold': threshold_fitness,
-                    'crossover_rate': taxa_crossover,
-                    'mutation_rate': taxa_mutacao,
-                    'risk_free_rate': config['risk_free_rate']
+                    'population_size': perfil_atual['parametros']['tamanho_populacao'],
+                    'max_generations': perfil_atual['parametros']['geracoes'],
+                    'threshold': perfil_atual['parametros']['threshold_fitness'],
+                    'crossover_rate': perfil_atual['parametros']['taxa_crossover'],
+                    'mutation_rate': perfil_atual['parametros']['taxa_mutacao'],
+                    'risk_free_rate': perfil_atual['parametros']['taxa_livre_risco']
                 }
+                
+                # Salvar perfil selecionado para uso posterior
+                st.session_state.perfil_investimento = st.session_state.perfil_selecionado
+                
                 st.session_state.etapa_atual = 3
                 st.rerun()
+    else:
+        # Mostrar mensagem quando está executando
+        st.info("🔄 **Otimização em andamento...** Aguarde a conclusão do processo.")
 
 @st.cache_data
 def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecionadas):
@@ -421,15 +531,16 @@ def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecion
 
     except ValueError as e:
         st.error(f"❌ Erro nos parâmetros do benchmark: {str(e)}")
-
+        # Retorna None para indicar que não há dados disponíveis
         return {
-            'bovespa': pd.Series([capital_inicial] * max(1, dias))
+            'bovespa': None
         }
     except Exception as e:
-        st.warning(f"⚠️ Erro ao baixar dados do Ibovespa, usando benchmark neutro: {str(e)}")
-
+        st.warning(f"⚠️ Erro ao baixar dados do Ibovespa: {str(e)}")
+        st.info("📊 **Nota:** Dados do Ibovespa não puderam ser carregados. Apenas a carteira otimizada será analisada.")
+        # Retorna None para indicar que não há dados disponíveis
         return {
-            'bovespa': pd.Series([capital_inicial] * max(1, dias))
+            'bovespa': None
         }
 
 def executar_otimizacao_real():
@@ -450,6 +561,9 @@ def executar_otimizacao_real():
     config = st.session_state.configuracao_investimento
     
     try:
+        # Marcar que otimização está sendo executada
+        st.session_state.executando_otimizacao = True
+        
         # Barra de progresso
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -458,8 +572,8 @@ def executar_otimizacao_real():
         progress_bar.progress(20)
         
         # Carrega dados históricos reais
-        coletor = ColetorDados(acoes)
-        returns_data = coletor.baixar_dados()
+        coletor = DataCollector(acoes)
+        returns_data = coletor.download_data()
         
         # Filtra apenas as colunas que correspondem às ações selecionadas (com sufixo .SA)
         acoes_com_sufixo = [ticker + ".SA" if not ticker.endswith('.SA') else ticker for ticker in acoes]
@@ -577,12 +691,15 @@ def executar_otimizacao_real():
         dias = 120
         valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + portfolio_returns.tail(dias)))
         
-
+        # Calcular benchmarks reais
         returns_data_hash = str(hash(str(returns_data.values.tobytes())))
         benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes_com_dados)
         
         progress_bar.empty()
         status_text.empty()
+        
+        # Marcar que otimização foi concluída
+        st.session_state.executando_otimizacao = False
         
         return {
             'pesos': pesos_otimos,
@@ -592,110 +709,23 @@ def executar_otimizacao_real():
             'cvar': cvar_final,
             'fitness_hist': fitness_hist,
             'valor_portfolio': valor_portfolio,
-            'valor_bovespa': benchmarks['bovespa'],
+            'valor_bovespa': benchmarks['bovespa'] if benchmarks['bovespa'] is not None else [],
             'datas': pd.date_range(end=datetime.now(), periods=len(valor_portfolio)),
             'geracoes_executadas': geracoes_executadas,
             'convergiu': fitness_final >= params['threshold']
         }
         
     except Exception as e:
+        # Marcar que otimização foi concluída (mesmo com erro)
+        st.session_state.executando_otimizacao = False
+        
         progress_bar.empty()
         status_text.empty()
-        st.error(f"Erro na otimização: {str(e)}")
+        st.error(f"❌ **Erro na otimização:** {str(e)}")
+        st.error("🔄 **Solução:** Verifique sua conexão com a internet e tente novamente.")
         
-        # Fallback para dados simulados em caso de erro
-        st.warning("Usando dados simulados devido ao erro. Verifique conectividade para dados reais.")
-        return executar_otimizacao_simulada()
-
-def executar_otimizacao_simulada():
-    """Fallback com dados simulados para demonstração.
-    
-    Utilizada quando a otimização real falha ou para testes.
-    Simula um algoritmo genético com parâmetros realísticos.
-    
-    Returns:
-        dict: Dicionário com resultados simulados da otimização
-        
-    Raises:
-        Exception: Erro durante simulação (raro)
-    """
-    acoes = st.session_state.acoes_selecionadas
-    params = st.session_state.parametros_otimizacao
-    config = st.session_state.configuracao_investimento
-    
-    n_acoes = len(acoes)
-    
-
-    progress_bar = st.progress(0)
-    status_text = st.empty()
-    
-    for i in range(101):
-        progress_bar.progress(i)
-        if i < 30:
-            status_text.text("🧬 Simulando população inicial...")
-        elif i < 80:
-            status_text.text(f"🔄 Evolução: Geração {int(i/80 * params['max_generations'])}")
-        else:
-            status_text.text("📊 Finalizando cálculos...")
-        time.sleep(0.01)
-    
-    progress_bar.empty()
-    status_text.empty()
-    
-
-    np.random.seed(42)
-    pesos_raw = np.random.dirichlet(np.ones(n_acoes))
-    pesos = pd.Series(pesos_raw, index=acoes)
-    
-
-    fitness_final = np.random.uniform(8.0, 15.0)
-    retorno_esperado = np.random.uniform(0.08, 0.15)
-    volatilidade = np.random.uniform(0.12, 0.25)
-    cvar_simulado = -np.random.uniform(0.03, 0.08)
-    
-
-    geracoes = params['max_generations']
-    fitness_inicial = fitness_final * 0.6
-    fitness_melhor = []
-    fitness_media = []
-    
-    for g in range(geracoes):
-        progresso = 1 - np.exp(-g/20)
-        fitness_ger = fitness_inicial + (fitness_final - fitness_inicial) * progresso
-        fitness_melhor.append(fitness_ger + np.random.normal(0, 0.1))
-        fitness_media.append(fitness_ger * 0.8 + np.random.normal(0, 0.05))
-    
-    # Simula valor do portfolio
-    dias = 120
-    retornos_simulados = np.random.normal(retorno_esperado/252, volatilidade/np.sqrt(252), dias)
-    valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_simulados))
-    
-
-    returns_data_hash = "simulacao_" + str(hash(str(acoes)))
-    benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes)
-    valor_bovespa = benchmarks['bovespa']
-    
-    # Limpa indicadores de progresso
-    time.sleep(0.5)
-    progress_bar.empty()
-    status_text.empty()
-    
-    return {
-        'pesos': pesos,
-        'fitness': fitness_final,
-        'retorno_esperado': retorno_esperado,
-        'volatilidade': volatilidade,
-        'cvar': cvar_simulado,
-        'fitness_hist': {
-            'melhor': fitness_melhor,
-            'media': fitness_media
-        },
-        'valor_portfolio': valor_portfolio,
-        'valor_bovespa': valor_bovespa,
-        'datas': pd.date_range(end=datetime.now(), periods=dias),
-        'geracoes_executadas': geracoes,
-        'convergiu': fitness_final >= params['threshold']
-    }
+        # Não usa fallback simulado - força o usuário a resolver o problema
+        st.stop()
 
 def mostrar_resultados():
     """Exibe os resultados da otimização com visualizações interativas.
@@ -717,7 +747,7 @@ def mostrar_resultados():
     config = st.session_state.configuracao_investimento
     
 
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3 = st.columns(3)
     
 
     def get_last_value(data):
@@ -733,8 +763,8 @@ def mostrar_resultados():
     if 'valor_bovespa' in resultado and len(resultado['valor_bovespa']) > 0:
         valor_final_bovespa = get_last_value(resultado['valor_bovespa'])
     else:
-        # Simula benchmark se não disponível
-        valor_final_bovespa = config['capital_inicial'] * 1.05
+        # Usa capital inicial quando dados do Ibovespa não estão disponíveis
+        valor_final_bovespa = config['capital_inicial']
     
     ganho_otimizado = valor_final_otimizado - config['capital_inicial']
     ganho_bovespa = valor_final_bovespa - config['capital_inicial']
@@ -744,19 +774,10 @@ def mostrar_resultados():
     with col2:
         st.metric("Retorno Esperado", f"{resultado['retorno_esperado']:.1%}")
     with col3:
-        st.metric("CVaR (Risco)", f"{resultado['cvar']:.3f}")
-    with col4:
         st.metric("Carteira Otimizada", f"R$ {valor_final_otimizado:,.2f}", f"R$ {ganho_otimizado:,.2f}")
-    with col5:
-    
-        if ganho_otimizado > ganho_bovespa:
-            delta_bovespa = f"+R$ {ganho_otimizado - ganho_bovespa:,.0f} vs Bovespa"
-        else:
-            delta_bovespa = f"-R$ {ganho_bovespa - ganho_otimizado:,.0f} vs Bovespa"
-        st.metric("vs Benchmark", f"{((valor_final_otimizado/config['capital_inicial'])-1):.1%}", delta_bovespa)
     
 
-    tab1, tab2, tab3 = st.tabs(["🥧 Alocação", "📈 Performance", "🧬 Evolução AG"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Alocação", "Performance", "Evolução AG", "Ibovespa"])
     
     with tab1:
         col1, col2 = st.columns([1, 1])
@@ -828,9 +849,9 @@ def mostrar_resultados():
     with tab2:
         st.subheader("Comparação de Performance")
         
-        # Aviso se benchmarks são simulados
-        if ('valor_bovespa' not in resultado or 'valor_aleatorio' not in resultado):
-            st.info("💡 **Nota:** Alguns benchmarks estão sendo simulados para demonstração. Execute uma nova otimização para obter dados reais.")
+        # Verificação de disponibilidade de dados reais
+        if 'valor_bovespa' not in resultado or len(resultado['valor_bovespa']) == 0:
+            st.warning("⚠️ **Atenção:** Dados do Ibovespa não disponíveis. Verifique sua conexão com a internet.")
         
         if len(resultado['valor_portfolio']) > 1:
             # Gráfico principal de comparação
@@ -839,17 +860,13 @@ def mostrar_resultados():
             ax.plot(resultado['datas'], resultado['valor_portfolio'], 
                    label="Carteira Otimizada (AG)", linewidth=3, color='#2E8B57')
             
-            # Verifica se benchmarks estão disponíveis para o gráfico
+            # Exibe dados reais do Ibovespa quando disponíveis
             if 'valor_bovespa' in resultado and len(resultado['valor_bovespa']) > 0:
                 ax.plot(resultado['datas'], resultado['valor_bovespa'], 
                        label="Índice Bovespa", linewidth=2, linestyle='--', color='#1f77b4', alpha=0.8)
             else:
-                # Simula benchmark se não disponível
-                dias = len(resultado['datas'])
-                retornos_bovespa_sim = np.random.normal(0.0003, 0.02, dias)
-                valor_bovespa_sim = config['capital_inicial'] * np.cumprod(1 + retornos_bovespa_sim)
-                ax.plot(resultado['datas'], valor_bovespa_sim, 
-                       label="Bovespa (Simulado)", linewidth=2, linestyle='--', color='#1f77b4', alpha=0.8)
+                # Informa que dados do Ibovespa não estão disponíveis
+                st.warning("📊 Dados do Ibovespa não puderam ser carregados. Apenas a carteira otimizada será exibida.")
             
             # Linha de referência do capital inicial
             ax.axhline(y=config['capital_inicial'], color='gray', linestyle='-', alpha=0.5, label='Capital Inicial')
@@ -894,37 +911,84 @@ def mostrar_resultados():
             convergencia = "✅ Sim" if resultado['convergiu'] else "❌ Não"
             st.metric("Convergiu", convergencia)
     
+    with tab4:
+        st.subheader("Evolução do Índice Ibovespa")
+        
+        # Gráfico da evolução do Ibovespa
+        if 'valor_bovespa' in resultado and len(resultado['valor_bovespa']) > 0:
+            fig, ax = plt.subplots(figsize=(12, 6))
+            
+            # Criar índice de dias para o gráfico
+            dias_simulacao = range(len(resultado['valor_bovespa']))
+            
+            ax.plot(dias_simulacao, resultado['valor_bovespa'], 
+                   color='#FF6B35', linewidth=2, label='Ibovespa')
+            
+            # Linha de referência do capital inicial
+            ax.axhline(y=config['capital_inicial'], color='gray', 
+                      linestyle='--', alpha=0.7, label='Capital Inicial')
+            
+            ax.set_title("Evolução do Valor Investido no Ibovespa")
+            ax.set_xlabel("Dias")
+            ax.set_ylabel("Valor (R$)")
+            ax.legend()
+            ax.grid(True, alpha=0.3)
+            
+            # Formatação do eixo Y para valores monetários
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'R$ {x:,.0f}'))
+            
+            st.pyplot(fig)
+            plt.close(fig)
+            
+            # Métricas do Ibovespa
+            col1, col2, col3, col4 = st.columns(4)
+            
+            valor_inicial_bovespa = resultado['valor_bovespa'].iloc[0] if hasattr(resultado['valor_bovespa'], 'iloc') else resultado['valor_bovespa'][0]
+            valor_final_bovespa = get_last_value(resultado['valor_bovespa'])
+            retorno_bovespa = (valor_final_bovespa / valor_inicial_bovespa) - 1
+            ganho_bovespa = valor_final_bovespa - config['capital_inicial']
+            
+            with col1:
+                st.metric("Valor Inicial", f"R$ {config['capital_inicial']:,.2f}")
+            with col2:
+                st.metric("Valor Final", f"R$ {valor_final_bovespa:,.2f}")
+            with col3:
+                st.metric("Retorno Total", f"{retorno_bovespa:.1%}")
+            with col4:
+                st.metric("Ganho/Perda", f"R$ {ganho_bovespa:,.2f}")
+            
+            # Informações adicionais sobre o Ibovespa
+            st.info("""
+            📊 **Sobre o Ibovespa**: O Índice Bovespa (Ibovespa) é o principal indicador do desempenho 
+            médio das cotações das ações negociadas na B3. Ele representa uma carteira teórica de ativos 
+            construída a partir de uma carteira real, que busca refletir as variações e o comportamento 
+            médio dos preços dos ativos de maior negociabilidade e representatividade do mercado brasileiro.
+            """)
+            
+        else:
+            st.warning("⚠️ Dados do Ibovespa não disponíveis para este período.")
+            st.info("""
+            Os dados do Ibovespa podem não estar disponíveis devido a:
+            - Problemas de conectividade com a fonte de dados
+            - Período de simulação muito recente
+            - Feriados ou fins de semana
+            """)
 
     st.divider()
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col1:
-        if st.button("⬅️ Voltar aos Parâmetros"):
-            st.session_state.etapa_atual = 3
-            st.rerun()
     
+    # Botão centralizado para nova otimização
+    col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        if st.button("🔄 Nova Otimização"):
-
+        if st.button("🔄 Nova Otimização", use_container_width=True):
             st.session_state.etapa_atual = 1
             st.session_state.resultado_otimizacao = None
             st.session_state.acoes_selecionadas = []
             st.session_state.configuracao_investimento = None
             st.session_state.parametros_otimizacao = None
             st.rerun()
-    
-    with col3:
-        if st.button("🔧 Ajustar Parâmetros"):
-            st.session_state.resultado_otimizacao = None
-            st.session_state.etapa_atual = 2
-            st.rerun()
-
-
-
 
 with st.sidebar:
     st.title("Navegação")
-    
-
     etapas = ["Seleção", "Parâmetros", "Resultados"]
     etapa_atual = st.session_state.etapa_atual
     
@@ -938,7 +1002,6 @@ with st.sidebar:
     
     st.divider()
     
-
     if etapa_atual > 1 and st.session_state.acoes_selecionadas:
         st.write("**Resumo:**")
         st.write(f"• {len(st.session_state.acoes_selecionadas)} ações")
@@ -947,7 +1010,6 @@ with st.sidebar:
     
     if etapa_atual > 2 and st.session_state.parametros_otimizacao:
         st.write(f"• {st.session_state.parametros_otimizacao['max_generations']} gerações")
-
 
 if st.session_state.etapa_atual == 1:
     mostrar_selecao_acoes()

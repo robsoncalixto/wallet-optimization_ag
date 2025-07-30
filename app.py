@@ -3,7 +3,7 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend
+matplotlib.use('Agg')
 
 # Configuração para evitar warnings de emojis em matplotlib
 import warnings
@@ -18,89 +18,32 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'data')))
-from dados import ColetorDados
+from dados import ColetorDados, _baixar_dados_cached
 from portfolio import Portfolio
 from geneticAlgorithm import GeneticAlgorithm
 
-# Configurações iniciais do Streamlit
 st.set_page_config(page_title="Otimizador de Portfolio", layout="wide", initial_sidebar_state="expanded")
 
-# CSS para fonte menor em toda a aplicação
-st.markdown("""
-<style>
-    .main .block-container {
-        font-size: 0.85rem;
-    }
+@st.cache_data
+def _baixar_dados_ibovespa_cached(start_date, end_date):
+    """Função cached para download de dados do Ibovespa.
     
-    .stSelectbox > div > div > div {
-        font-size: 0.85rem;
-    }
-    
-    .stMultiSelect > div > div > div {
-        font-size: 0.85rem;
-    }
-    
-    .stNumberInput > div > div > input {
-        font-size: 0.85rem;
-    }
-    
-    .stSlider > div > div > div {
-        font-size: 0.85rem;
-    }
-    
-    .stButton > button {
-        font-size: 0.85rem;
-    }
-    
-    .stMetric {
-        font-size: 0.8rem;
-    }
-    
-    .stMarkdown {
-        font-size: 0.85rem;
-    }
-    
-    .stDataFrame {
-        font-size: 0.8rem;
-    }
-    
-    .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {
-        font-size: 0.85rem;
-    }
-    
-    .sidebar .block-container {
-        font-size: 0.8rem;
-    }
-    
-    h1 {
-        font-size: 1.8rem !important;
-    }
-    
-    h2 {
-        font-size: 1.4rem !important;
-    }
-    
-    h3 {
-        font-size: 1.2rem !important;
-    }
-     
-    .stInfo {
-        font-size: 0.8rem;
-    }
-    
-    .stWarning {
-        font-size: 0.8rem;
-    }
-    
-    .stSuccess {
-        font-size: 0.8rem;
-    }
-    
-    .stError {
-        font-size: 0.8rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+    Args:
+        start_date (datetime): Data de início
+        end_date (datetime): Data de fim
+        
+    Returns:
+        pd.DataFrame: DataFrame com preços de fechamento do Ibovespa
+        
+    Raises:
+        Exception: Erro ao baixar dados do yfinance
+    """
+    try:
+        import yfinance as yf
+        data = yf.download("^BVSP", start=start_date, end=end_date, auto_adjust=True)
+        return data
+    except Exception as e:
+        raise Exception(f"Erro ao baixar dados do Ibovespa: {str(e)}")
 
 @st.cache_data
 def carregar_empresas():
@@ -119,7 +62,7 @@ def carregar_empresas():
         if stocks_df.empty:
             raise pd.errors.EmptyDataError("Arquivo CSV está vazio")
             
-        # Filtra apenas as colunas necessárias: código, nome, preço
+
         empresas = []
         for _, row in stocks_df.iterrows():
             empresas.append({
@@ -143,7 +86,7 @@ def carregar_empresas():
         st.error(f"❌ Erro inesperado ao carregar dados das empresas: {str(e)}")
         return []
 
-# Inicializa estados da aplicação
+
 if "etapa_atual" not in st.session_state:
     st.session_state.etapa_atual = 1
 if "acoes_selecionadas" not in st.session_state:
@@ -378,7 +321,7 @@ def mostrar_parametros_algoritmo():
         
         with col_btn2:
             if st.button("🚀 Executar Otimização", type="primary"):
-                # Salva parâmetros
+
                 st.session_state.parametros_otimizacao = {
                     'population_size': tamanho_populacao,
                     'max_generations': max_geracoes,
@@ -392,7 +335,7 @@ def mostrar_parametros_algoritmo():
 
 @st.cache_data
 def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecionadas):
-    """Calcula benchmark do Índice Bovespa.
+    """Calcula benchmark do Índice Bovespa usando dados reais do yfinance.
     
     Args:
         returns_data_hash (str): Hash dos dados de retorno para cache
@@ -412,26 +355,79 @@ def calcular_benchmarks(returns_data_hash, capital_inicial, dias, acoes_selecion
         if dias <= 0:
             raise ValueError("Número de dias deve ser positivo")
             
-        # Simula benchmark Bovespa com parâmetros realistas
-        # Retorno médio diário: ~0.03% (7.8% ao ano)
-        # Volatilidade diária: ~2% (32% ao ano)
-        np.random.seed(42)  # Seed fixo para reprodutibilidade
-        retornos_bovespa = np.random.normal(0.0003, 0.02, dias)
-        valor_bovespa = pd.Series(capital_inicial * np.cumprod(1 + retornos_bovespa))
+        # Baixa dados reais do Ibovespa usando função cached
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=dias + 60)  # Margem maior para garantir dados suficientes
+        
 
+        bovespa_data = _baixar_dados_ibovespa_cached(start_date, end_date)
+        
+        if bovespa_data is None or bovespa_data.empty:
+            raise ValueError("Não foi possível baixar dados do Ibovespa")
+            
+        # Extrai preços de fechamento (lida com MultiIndex)
+        if 'Close' in bovespa_data.columns:
+            close_prices = bovespa_data['Close']
+
+            if hasattr(close_prices, 'squeeze'):
+                close_prices = close_prices.squeeze()
+        elif hasattr(bovespa_data.columns, 'levels') and 'Close' in bovespa_data.columns.get_level_values(0):
+            # MultiIndex - pega a coluna Close
+            close_prices = bovespa_data.xs('Close', axis=1, level=0)
+            if hasattr(close_prices, 'squeeze'):
+                close_prices = close_prices.squeeze()
+        else:
+
+            close_cols = [col for col in bovespa_data.columns if 'Close' in str(col)]
+            if close_cols:
+                close_prices = bovespa_data[close_cols[0]]
+                if hasattr(close_prices, 'squeeze'):
+                    close_prices = close_prices.squeeze()
+            else:
+                raise ValueError("Coluna 'Close' não encontrada nos dados do Ibovespa")
+            
+
+        bovespa_returns = close_prices.pct_change().dropna()
+        
+        if len(bovespa_returns) == 0:
+            raise ValueError("Não foi possível calcular retornos do Ibovespa")
+        
+
+        if len(bovespa_returns) < dias:
+            st.warning(f"⚠️ Apenas {len(bovespa_returns)} dias de dados disponíveis para o Ibovespa. Usando todos os dados disponíveis.")
+            retornos_utilizados = bovespa_returns
+        else:
+            retornos_utilizados = bovespa_returns.tail(dias)
+        
+        # Converte para array numpy 1D de forma segura
+        retornos_array = np.asarray(retornos_utilizados).flatten()
+        
+
+        retornos_array = retornos_array[~np.isnan(retornos_array)]
+        
+        if len(retornos_array) == 0:
+            raise ValueError("Nenhum retorno válido encontrado")
+            
+
+        valor_cumulativo = capital_inicial * np.cumprod(1 + retornos_array)
+        valor_bovespa = pd.Series(valor_cumulativo)
+        
+
+        valor_bovespa.reset_index(drop=True, inplace=True)
+        
         return {
             'bovespa': valor_bovespa
         }
 
     except ValueError as e:
         st.error(f"❌ Erro nos parâmetros do benchmark: {str(e)}")
-        # Retorna benchmark neutro em caso de erro
+
         return {
             'bovespa': pd.Series([capital_inicial] * max(1, dias))
         }
     except Exception as e:
-        st.warning(f"⚠️ Erro ao calcular benchmark, usando simulação padrão: {str(e)}")
-        # Em caso de erro, simula benchmark neutro
+        st.warning(f"⚠️ Erro ao baixar dados do Ibovespa, usando benchmark neutro: {str(e)}")
+
         return {
             'bovespa': pd.Series([capital_inicial] * max(1, dias))
         }
@@ -472,10 +468,10 @@ def executar_otimizacao_real():
         if len(acoes_disponiveis) < 2:
             raise ValueError(f"Dados insuficientes. Apenas {len(acoes_disponiveis)} ações disponíveis de {len(acoes)} selecionadas.")
         
-        # Filtra returns_data para conter apenas as ações disponíveis
+
         returns_data = returns_data[acoes_disponiveis]
         
-        # Mapeia de volta para os códigos originais (sem .SA)
+
         ticker_mapping = {}
         for ticker in acoes:
             ticker_sa = ticker + ".SA" if not ticker.endswith('.SA') else ticker
@@ -484,10 +480,10 @@ def executar_otimizacao_real():
             elif ticker in acoes_disponiveis:
                 ticker_mapping[ticker] = ticker
         
-        # Atualiza lista de ações para apenas as que têm dados
+
         acoes_com_dados = list(ticker_mapping.keys())
         
-        # Informa sobre ações que não puderam ser carregadas
+
         acoes_nao_carregadas = [ticker for ticker in acoes if ticker not in acoes_com_dados]
         if acoes_nao_carregadas:
             st.warning(f"⚠️ {len(acoes_nao_carregadas)} ação(ões) não puderam ser carregadas: {', '.join(acoes_nao_carregadas[:5])}{'...' if len(acoes_nao_carregadas) > 5 else ''}. Continuando com {len(acoes_com_dados)} ações.")
@@ -495,14 +491,14 @@ def executar_otimizacao_real():
         status_text.text("🧬 Inicializando população do algoritmo genético...")
         progress_bar.progress(40)
         
-        # Configuração inicial dos pesos apenas para ações com dados
+
         n_acoes = len(acoes_com_dados)
         initial_weights = {ticker: 1/n_acoes for ticker in acoes_com_dados}
         
-        # Cria população inicial usando mapeamento correto
+
         population = []
         for _ in range(params['population_size']):
-            # Cria weights com mapeamento correto para as colunas dos dados
+
             weights_for_portfolio = {}
             for ticker_orig in acoes_com_dados:
                 ticker_data = ticker_mapping[ticker_orig]
@@ -518,7 +514,7 @@ def executar_otimizacao_real():
         status_text.text("🔄 Executando evolução do algoritmo genético...")
         progress_bar.progress(60)
         
-        # Configura e executa algoritmo genético
+
         ga = GeneticAlgorithm(
             population=population,
             fitness_key=lambda p: p.fitness(),
@@ -529,19 +525,19 @@ def executar_otimizacao_real():
             threshold=params['threshold']
         )
         
-        # Executa otimização
+
         best_portfolio = ga.run()
         
         status_text.text("📈 Calculando métricas finais...")
         progress_bar.progress(90)
         
-        # Coleta resultados
-        pesos_otimos_raw = best_portfolio.weights  # Dict com tickers .SA
+
+        pesos_otimos_raw = best_portfolio.weights
         fitness_final = best_portfolio.fitness()
         retorno_esperado = best_portfolio.ExpReturn
         cvar_final = best_portfolio.cvar
         
-        # Converte pesos de volta para códigos originais para exibição
+
         pesos_otimos_display = {}
         for ticker_orig, ticker_data in ticker_mapping.items():
             if ticker_data in pesos_otimos_raw:
@@ -550,14 +546,14 @@ def executar_otimizacao_real():
         pesos_otimos = pd.Series(pesos_otimos_display)
         
         # Métricas adicionais - usa os pesos corretos alinhados com os dados
-        pesos_para_calculo = pd.Series(pesos_otimos_raw)  # Usa os pesos com .SA
+        pesos_para_calculo = pd.Series(pesos_otimos_raw)
         portfolio_returns = returns_data.dot(pesos_para_calculo)
-        volatilidade = portfolio_returns.std() * np.sqrt(252)  # Anualizada
+        volatilidade = portfolio_returns.std() * np.sqrt(252)
         
         progress_bar.progress(100)
         status_text.text("✅ Otimização concluída!")
         
-        # Limpa indicadores de progresso após um breve delay
+
         time.sleep(1)
         progress_bar.empty()
         status_text.empty()
@@ -570,18 +566,18 @@ def executar_otimizacao_real():
             }
             geracoes_executadas = len(ga.results['best_fitness'])
         else:
-            # Dados simulados se histórico não disponível
+
             geracoes_executadas = params['max_generations']
             fitness_hist = {
                 'melhor': [fitness_final] * geracoes_executadas,
                 'media': [fitness_final * 0.8] * geracoes_executadas
             }
         
-        # Simula evolução do portfólio
-        dias = 120  # 4 meses
+
+        dias = 120
         valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + portfolio_returns.tail(dias)))
         
-        # Adiciona comparação com benchmarks
+
         returns_data_hash = str(hash(str(returns_data.values.tobytes())))
         benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes_com_dados)
         
@@ -629,7 +625,7 @@ def executar_otimizacao_simulada():
     
     n_acoes = len(acoes)
     
-    # Simula progresso
+
     progress_bar = st.progress(0)
     status_text = st.empty()
     
@@ -646,18 +642,18 @@ def executar_otimizacao_simulada():
     progress_bar.empty()
     status_text.empty()
     
-    # Gera pesos simulados
+
     np.random.seed(42)
     pesos_raw = np.random.dirichlet(np.ones(n_acoes))
     pesos = pd.Series(pesos_raw, index=acoes)
     
-    # Métricas simuladas realísticas
+
     fitness_final = np.random.uniform(8.0, 15.0)
     retorno_esperado = np.random.uniform(0.08, 0.15)
     volatilidade = np.random.uniform(0.12, 0.25)
     cvar_simulado = -np.random.uniform(0.03, 0.08)
     
-    # Simula evolução
+
     geracoes = params['max_generations']
     fitness_inicial = fitness_final * 0.6
     fitness_melhor = []
@@ -674,9 +670,10 @@ def executar_otimizacao_simulada():
     retornos_simulados = np.random.normal(retorno_esperado/252, volatilidade/np.sqrt(252), dias)
     valor_portfolio = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_simulados))
     
-    # Simula benchmark
-    retornos_bovespa = np.random.normal(0.0003, 0.02, dias)  # ~7.8% aa, 32% vol
-    valor_bovespa = pd.Series(config['capital_inicial'] * np.cumprod(1 + retornos_bovespa))
+
+    returns_data_hash = "simulacao_" + str(hash(str(acoes)))
+    benchmarks = calcular_benchmarks(returns_data_hash, config['capital_inicial'], dias, acoes)
+    valor_bovespa = benchmarks['bovespa']
     
     # Limpa indicadores de progresso
     time.sleep(0.5)
@@ -709,9 +706,9 @@ def mostrar_resultados():
     Raises:
         Exception: Erro ao executar otimização ou gerar visualizações
     """
-    st.title("📊 Resultados da Otimização")
+    st.title("Resultados da Otimização")
     
-    # Executa otimização se ainda não foi executada ou se falta benchmark
+
     if (st.session_state.resultado_otimizacao is None or 
         'valor_bovespa' not in st.session_state.resultado_otimizacao):
         st.session_state.resultado_otimizacao = executar_otimizacao_real()
@@ -719,25 +716,25 @@ def mostrar_resultados():
     resultado = st.session_state.resultado_otimizacao
     config = st.session_state.configuracao_investimento
     
-    # Métricas principais comparativas
+
     col1, col2, col3, col4, col5 = st.columns(5)
     
-    # Calcula valores finais com verificações defensivas
+
     def get_last_value(data):
         """Obtém o último valor de um array ou Series de forma segura"""
         if hasattr(data, 'iloc'):
-            return data.iloc[-1]  # pandas Series
+            return data.iloc[-1]
         else:
-            return data[-1]  # numpy array
+            return data[-1]
     
     valor_final_otimizado = get_last_value(resultado['valor_portfolio']) if len(resultado['valor_portfolio']) > 0 else config['capital_inicial']
     
-    # Verifica se os benchmarks existem no resultado
+
     if 'valor_bovespa' in resultado and len(resultado['valor_bovespa']) > 0:
         valor_final_bovespa = get_last_value(resultado['valor_bovespa'])
     else:
         # Simula benchmark se não disponível
-        valor_final_bovespa = config['capital_inicial'] * 1.05  # ~5% de retorno simulado
+        valor_final_bovespa = config['capital_inicial'] * 1.05
     
     ganho_otimizado = valor_final_otimizado - config['capital_inicial']
     ganho_bovespa = valor_final_bovespa - config['capital_inicial']
@@ -751,14 +748,14 @@ def mostrar_resultados():
     with col4:
         st.metric("Carteira Otimizada", f"R$ {valor_final_otimizado:,.2f}", f"R$ {ganho_otimizado:,.2f}")
     with col5:
-        # Compara performance
+    
         if ganho_otimizado > ganho_bovespa:
             delta_bovespa = f"+R$ {ganho_otimizado - ganho_bovespa:,.0f} vs Bovespa"
         else:
             delta_bovespa = f"-R$ {ganho_bovespa - ganho_otimizado:,.0f} vs Bovespa"
         st.metric("vs Benchmark", f"{((valor_final_otimizado/config['capital_inicial'])-1):.1%}", delta_bovespa)
     
-    # Tabs para diferentes visualizações
+
     tab1, tab2, tab3 = st.tabs(["🥧 Alocação", "📈 Performance", "🧬 Evolução AG"])
     
     with tab1:
@@ -773,7 +770,7 @@ def mostrar_resultados():
             })
             st.dataframe(df_pesos, use_container_width=True)
             
-            # Botão de exportar
+
             csv = df_pesos.to_csv(index=False)
             st.download_button(
                 label="📥 Exportar Alocação (CSV)",
@@ -785,35 +782,35 @@ def mostrar_resultados():
         with col2:
             st.subheader("Distribuição por Ativo")
             try:
-                # Prepara dados para gráfico de barras horizontais
-                pesos_plot = resultado['pesos'].sort_values(ascending=True)  # Crescente para barras
+
+                pesos_plot = resultado['pesos'].sort_values(ascending=True)
                 if len(pesos_plot) > 15:
                     outros = pesos_plot[:-15].sum()
-                    pesos_plot = pesos_plot[-15:]  # Pega os 15 maiores
+                    pesos_plot = pesos_plot[-15:]
                     if outros > 0:
                         pesos_plot = pd.concat([pd.Series({'Outros': outros}), pesos_plot])
                 
                 fig, ax = plt.subplots(figsize=(8, max(6, len(pesos_plot) * 0.4)))
                 
-                # Cria barras horizontais com cores gradientes
+
                 colors = plt.cm.viridis(np.linspace(0, 1, len(pesos_plot)))
                 bars = ax.barh(range(len(pesos_plot)), pesos_plot.values, color=colors)
                 
-                # Configurações do gráfico
+
                 ax.set_yticks(range(len(pesos_plot)))
                 ax.set_yticklabels(pesos_plot.index, fontsize=9)
                 ax.set_xlabel("Alocação (%)")
                 ax.set_title("Alocação Ótima da Carteira", fontsize=12, fontweight='bold')
                 
-                # Adiciona valores nas barras
+
                 for i, (bar, valor) in enumerate(zip(bars, pesos_plot.values)):
                     ax.text(valor + max(pesos_plot.values) * 0.01, i, f'{valor:.1%}', 
                            va='center', fontsize=8, fontweight='bold')
                 
-                # Formata eixo x como percentual
+
                 ax.xaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'{x:.1%}'))
                 
-                # Ajustes visuais
+
                 ax.grid(axis='x', alpha=0.3, linestyle='--')
                 ax.spines['top'].set_visible(False)
                 ax.spines['right'].set_visible(False)
@@ -863,7 +860,7 @@ def mostrar_resultados():
             ax.grid(True, alpha=0.3)
             ax.legend(loc='upper left')
             
-            # Formatação do eixo Y para valores monetários
+
             ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'R$ {x:,.0f}'))
             
             plt.tight_layout()
@@ -887,7 +884,7 @@ def mostrar_resultados():
         st.pyplot(fig)
         plt.close(fig)  # Clean up memory
         
-        # Estatísticas do algoritmo
+
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("Melhor Fitness", f"{max(resultado['fitness_hist']['melhor']):.3f}")
@@ -897,7 +894,7 @@ def mostrar_resultados():
             convergencia = "✅ Sim" if resultado['convergiu'] else "❌ Não"
             st.metric("Convergiu", convergencia)
     
-    # Botões de navegação
+
     st.divider()
     col1, col2, col3 = st.columns([1, 1, 1])
     with col1:
@@ -907,7 +904,7 @@ def mostrar_resultados():
     
     with col2:
         if st.button("🔄 Nova Otimização"):
-            # Reset estados para nova otimização
+
             st.session_state.etapa_atual = 1
             st.session_state.resultado_otimizacao = None
             st.session_state.acoes_selecionadas = []
@@ -921,15 +918,13 @@ def mostrar_resultados():
             st.session_state.etapa_atual = 2
             st.rerun()
 
-# ================================
-# INTERFACE PRINCIPAL
-# ================================
 
-# Sidebar com navegação e progresso
+
+
 with st.sidebar:
     st.title("Navegação")
     
-    # Indicador de progresso
+
     etapas = ["Seleção", "Parâmetros", "Resultados"]
     etapa_atual = st.session_state.etapa_atual
     
@@ -943,7 +938,7 @@ with st.sidebar:
     
     st.divider()
     
-    # Resumo rápido se em etapas avançadas
+
     if etapa_atual > 1 and st.session_state.acoes_selecionadas:
         st.write("**Resumo:**")
         st.write(f"• {len(st.session_state.acoes_selecionadas)} ações")
@@ -953,7 +948,7 @@ with st.sidebar:
     if etapa_atual > 2 and st.session_state.parametros_otimizacao:
         st.write(f"• {st.session_state.parametros_otimizacao['max_generations']} gerações")
 
-# Roteamento das etapas
+
 if st.session_state.etapa_atual == 1:
     mostrar_selecao_acoes()
 elif st.session_state.etapa_atual == 2:
@@ -961,7 +956,7 @@ elif st.session_state.etapa_atual == 2:
 elif st.session_state.etapa_atual == 3:
     mostrar_resultados()
 
-# Footer
+
 st.divider()
 st.markdown("""
 <div style='text-align: center; color: #888;'>

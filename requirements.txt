@@ -3,3 +3,6 @@ numpy
 yfinance
 matplotlib
 streamlit
+pytest
+pytest-cov
+pytest-html

@@ -2,7 +2,9 @@
 
 ![Tests](https://github.com/robsoncalixto/wallet_optimization_ag/actions/workflows/tests.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12.2-brightgreen)
-![Status](https://img.shields.io/badge/Status-Concluído-success)
+![pytest](https://img.shields.io/badge/pytest-8.4.1-blue)
+![Coverage](https://codecov.io/gh/robsoncalixto/wallet_optimization_ag/branch/master/graph/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Descrição
 
@@ -97,7 +99,7 @@ streamlit run app.py
 
 A interface web oferece:
 - 📊 Seleção interativa de ações da B3
-- ⚙️ Configuração de parâmetros do algoritmo genético
+- ⚙️ Visualização dos parâmetros do algoritmo genético
 - 📉 Gráficos de convergência e composição do portfólio
 - 📊 Comparação com benchmarks (Bovespa)
 
@@ -126,71 +128,24 @@ streamlit run app.py
 
 ## Testes
 
-O projeto inclui uma suíte abrangente de **121 testes unitários** para validar todos os módulos principais. Todos os testes estão passando e são executados automaticamente no CI/CD.
-
-### Estrutura dos Testes
-
-- **`test/test_chromosome.py`**: Testes para a classe abstrata Chromosome (15 testes)
-- **`test/test_data_collector.py`**: Testes para coleta e processamento de dados (21 testes)
-- **`test/test_portfolio.py`**: Testes para funcionalidade de portfólio (46 testes)  
-- **`test/test_genetic_algorithm.py`**: Testes para o algoritmo genético (39 testes)
-
 ### Como Executar os Testes
 
-#### Executar Todos os Testes (Recomendado)
 ```bash
-# Da raiz do projeto
-python -m unittest discover test -v
+# Executar todos os testes na raiz do projeto
+pytest test/ -v
 ```
 
-#### Executar Testes de um Módulo Específico
+#### Executar Testes de Arquivos Específicos
 ```bash
-# Testes do módulo Portfolio
-python -m unittest test.test_portfolio -v
+# Testes do Portfolio
+pytest test/test_portfolio.py -v
 
 # Testes do Algoritmo Genético
-python -m unittest test.test_genetic_algorithm -v
+pytest test/test_genetic_algorithm.py -v
 
 # Testes do Coletor de Dados
-python -m unittest test.test_data_collector -v
-
-# Testes do Chromosome
-python -m unittest test.test_chromosome -v
+pytest test/test_data_collector.py -v
 ```
-
-#### Executar Teste Individual
-```bash
-# Executar uma classe de teste específica
-python -m unittest test.test_portfolio.TestPortfolioFitness -v
-
-# Executar um método de teste específico
-python -m unittest test.test_portfolio.TestPortfolioFitness.test_fitness_returns_float -v
-```
-
-#### Saída Silenciosa (Apenas Resultados)
-```bash
-python -m unittest discover test
-```
-
-### Cobertura dos Testes
-
-Os testes cobrem:
-- ✅ **Funcionalidades básicas** de todos os módulos
-- ✅ **Casos extremos** (edge cases) e validação de parâmetros
-- ✅ **Testes de integração** entre componentes
-- ✅ **Comportamento com dados mockados** para isolar dependências
-- ✅ **Tratamento de erros** e validação de tipos
-- ✅ **Operações matemáticas** (fitness, crossover, mutação)
-- ✅ **Manipulação de dados** financeiros
-
-### Integração Contínua
-
-Os testes são executados automaticamente no **GitHub Actions** em múltiplas versões do Python:
-- Python 3.10
-- Python 3.11  
-- Python 3.12.2
-
-O status dos testes pode ser verificado pelo badge no topo deste README.
 
 ## Equipe
 

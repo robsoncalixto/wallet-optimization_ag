@@ -1,12 +1,11 @@
 """
 Testes para o módulo data_collector.py
 
-Este módulo contém testes abrangentes para as funções e classes relacionadas
-à coleta de dados financeiros, incluindo testes com dados mockados para evitar
-dependências externas durante os testes.
+Este módulo contém testes para as funções e classes relacionadas
+a coleta de dados financeiros, incluindo testes com dados mockados.
 """
 
-import unittest
+import pytest
 from unittest.mock import patch, MagicMock, Mock
 import pandas as pd
 import numpy as np
@@ -14,69 +13,68 @@ from datetime import datetime, timedelta
 import sys
 import os
 
-# Adiciona o diretório pai ao path para importar os módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data_collector import add_suffix, create_tickers_array, DataCollector, _download_data_cached
 
 
-class TestUtilityFunctions(unittest.TestCase):
+class TestUtilityFunctions:
         
     def test_add_suffix_basic(self):
         result = add_suffix("PETR4")
-        self.assertEqual(result, "PETR4.SA")
+        assert result == "PETR4.SA"
     
     def test_add_suffix_empty_string(self):
         result = add_suffix("")
-        self.assertEqual(result, ".SA")
+        assert result == ".SA"
     
     def test_add_suffix_with_spaces(self):
         result = add_suffix("PETR 4")
-        self.assertEqual(result, "PETR 4.SA")
+        assert result == "PETR 4.SA"
     
     def test_add_suffix_with_numbers(self):
         result = add_suffix("123")
-        self.assertEqual(result, "123.SA")
+        assert result == "123.SA"
     
     def test_add_suffix_with_special_characters(self):
         result = add_suffix("PETR-4")
-        self.assertEqual(result, "PETR-4.SA")
+        assert result == "PETR-4.SA"
     
     def test_create_tickers_array_basic(self):
         tickers = ["PETR4", "VALE3", "ITUB4"]
         result = create_tickers_array(tickers)
         expected = ["PETR4.SA", "VALE3.SA", "ITUB4.SA"]
-        self.assertEqual(result, expected)
+        assert result == expected
     
     def test_create_tickers_array_empty_list(self):
         result = create_tickers_array([])
-        self.assertEqual(result, [])
+        assert result == []
     
     def test_create_tickers_array_single_ticker(self):
         result = create_tickers_array(["PETR4"])
-        self.assertEqual(result, ["PETR4.SA"])
+        assert result == ["PETR4.SA"]
     
     def test_create_tickers_array_preserves_order(self):
         tickers = ["VALE3", "PETR4", "ITUB4", "BBDC4"]
         result = create_tickers_array(tickers)
         expected = ["VALE3.SA", "PETR4.SA", "ITUB4.SA", "BBDC4.SA"]
-        self.assertEqual(result, expected)
+        assert result == expected
 
 
-class TestDataCollectorInitialization(unittest.TestCase):
+class TestDataCollectorInitialization:
         
     def test_init_with_defaults(self):
         tickers = ["PETR4", "VALE3"]
         collector = DataCollector(tickers)
         
-        self.assertEqual(collector.tickers, tickers)
-        self.assertEqual(collector.benchmark, "^BVSP")
-        self.assertTrue(collector.cache)
+        assert collector.tickers == tickers
+        assert collector.benchmark == "^BVSP"
+        assert collector.cache
         
         # Verifica se as datas padrão são razoáveis
-        self.assertIsInstance(collector.start, datetime)
-        self.assertIsInstance(collector.end, datetime)
-        self.assertLess(collector.start, collector.end)
+        assert isinstance(collector.start, datetime)
+        assert isinstance(collector.end, datetime)
+        assert collector.start < collector.end
     
     def test_init_with_custom_values(self):
         tickers = ["PETR4", "VALE3"]
@@ -92,15 +90,15 @@ class TestDataCollectorInitialization(unittest.TestCase):
             cache=False
         )
         
-        self.assertEqual(collector.tickers, tickers)
-        self.assertEqual(collector.benchmark, benchmark)
-        self.assertEqual(collector.start, start_date)
-        self.assertEqual(collector.end, end_date)
-        self.assertFalse(collector.cache)
+        assert collector.tickers == tickers
+        assert collector.benchmark == benchmark
+        assert collector.start == start_date
+        assert collector.end == end_date
+        assert not collector.cache
     
     def test_init_with_empty_tickers(self):
         collector = DataCollector([])
-        self.assertEqual(collector.tickers, [])
+        assert collector.tickers == []
     
     def test_init_date_validation(self):
         tickers = ["PETR4"]
@@ -109,13 +107,13 @@ class TestDataCollectorInitialization(unittest.TestCase):
         
         # O construtor não valida datas, mas isso pode ser um comportamento esperado
         collector = DataCollector(tickers, start=start_date, end=end_date)
-        self.assertEqual(collector.start, start_date)
-        self.assertEqual(collector.end, end_date)
+        assert collector.start == start_date
+        assert collector.end == end_date
 
 
-class TestDataCollectorDownload(unittest.TestCase):
+class TestDataCollectorDownload:
         
-    def setUp(self):
+    def setup_method(self):
         self.tickers = ["PETR4", "VALE3"]
         self.collector = DataCollector(self.tickers)
     
@@ -168,9 +166,9 @@ class TestDataCollectorDownload(unittest.TestCase):
         )
 
 
-class TestDownloadDataCached(unittest.TestCase):
+class TestDownloadDataCached:
     
-    def setUp(self):
+    def setup_method(self):
         self.tickers = ("PETR4", "VALE3")
         self.benchmark = "^BVSP"
         self.start = datetime(2023, 1, 1)
@@ -191,7 +189,7 @@ class TestDownloadDataCached(unittest.TestCase):
         
         result = _download_data_cached(single_ticker, self.benchmark, self.start, self.end)
         
-        self.assertIsInstance(result, pd.DataFrame)
+        assert isinstance(result, pd.DataFrame)
     
     @patch('data_collector.yf.download')
     def test_download_data_cached_handles_existing_suffix(self, mock_yf_download):
@@ -204,9 +202,9 @@ class TestDownloadDataCached(unittest.TestCase):
         
         # Verifica se não duplicou o sufixo
         call_args = mock_yf_download.call_args[0][0]
-        self.assertIn("PETR4.SA", call_args)
-        self.assertIn("VALE3.SA", call_args)
-        self.assertNotIn("PETR4.SA.SA", call_args)
+        assert "PETR4.SA" in call_args
+        assert "VALE3.SA" in call_args
+        assert "PETR4.SA.SA" not in call_args
     
     @patch('data_collector.yf.download')
     def test_download_data_cached_handles_benchmark_without_suffix(self, mock_yf_download):
@@ -216,25 +214,25 @@ class TestDownloadDataCached(unittest.TestCase):
         _download_data_cached(self.tickers, self.benchmark, self.start, self.end)
         
         call_args = mock_yf_download.call_args[0][0]
-        self.assertIn("^BVSP", call_args)
-        self.assertNotIn("^BVSP.SA", call_args)
+        assert "^BVSP" in call_args
+        assert "^BVSP.SA" not in call_args
     
     
     
 
 
-class TestEdgeCases(unittest.TestCase):
+class TestEdgeCases:
     
     def test_data_collector_with_none_values(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             DataCollector(None)
     
     def test_add_suffix_with_none(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             add_suffix(None)
     
     def test_create_tickers_array_with_none_elements(self):
-        with self.assertRaises(TypeError):
+        with pytest.raises(TypeError):
             create_tickers_array([None, "PETR4"])
     
     @patch('data_collector.yf.download')
@@ -250,11 +248,11 @@ class TestEdgeCases(unittest.TestCase):
         # O yfinance deve lidar com isso, mas testamos se não quebra
         try:
             result = collector.download_data()
-            self.assertIsInstance(result, pd.DataFrame)
+            assert isinstance(result, pd.DataFrame)
         except Exception:
             pass  # Comportamento aceitável para datas inválidas
 
 
 if __name__ == '__main__':
     # Configuração para executar os testes
-    unittest.main(verbosity=2)
+    pytest.main([__file__, "-v"])

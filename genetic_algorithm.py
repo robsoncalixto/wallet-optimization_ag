@@ -71,7 +71,14 @@ class GeneticAlgorithm(Generic[T]):
             Tuple[C, C]: Dois cromossomos selecionados
         """
         participants = choices(self._population, k=competitors)
-        return tuple(sorted(participants, key=self._fitness_key, reverse=True)[:2])
+        sorted_participants = sorted(participants, key=self._fitness_key, reverse=True)
+        
+        # Garante que sempre retornamos 2 cromossomos
+        if len(sorted_participants) >= 2:
+            return tuple(sorted_participants[:2])
+        else:
+            # Se há apenas 1 participante, duplica
+            return tuple([sorted_participants[0], sorted_participants[0]])
 
     def _reduce_replace(self) -> None:
         """Substitui a população atual por uma nova geração."""
@@ -130,14 +137,14 @@ class GeneticAlgorithm(Generic[T]):
         
         for generation in range(self._max_generations):
             current_best_fitness = self._fitness_key(best)
-            if current_best_fitness >= self._threshold:
-                return best
-                
             current_mean_fitness = mean(map(self._fitness_key, self._population))
             gens.append(generation)
             best_fitness_list.append(current_best_fitness)
             mean_fitness_list.append(current_mean_fitness)
             
+            if current_best_fitness >= self._threshold:
+                break
+                
             print(f"Generation: {generation}, Best Fitness: {current_best_fitness}, Mean Fitness: {current_mean_fitness}")
             
             self._reduce_replace()

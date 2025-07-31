@@ -12,6 +12,8 @@ import streamlit as st
 
 def add_suffix(ticker: str) -> str:
     """Adiciona sufixo .SA aos tickers brasileiros."""
+    if ticker is None:
+        raise TypeError("ticker cannot be None")
     return ticker + ".SA"
 
 def create_tickers_array(tickers: list) -> list:
@@ -90,6 +92,8 @@ class DataCollector:
             end: Data de fim dos dados
             cache: Se deve usar cache para evitar downloads repetidos
         """
+        if tickers is None:
+            raise TypeError("tickers cannot be None")
         self.tickers = tickers
         self.benchmark = benchmark
         self.start = start

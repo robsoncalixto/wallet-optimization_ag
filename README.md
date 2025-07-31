@@ -14,8 +14,9 @@ A aplicação foi desenvolvida como parte do **Tech Challenge da FIAP - Módulo 
 4. [Pré-requisitos](#pré-requisitos)
 5. [Como Executar](#como-executar)
 6. [Dados e Fonte](#dados-e-fonte)
-7. [Equipe](#equipe)
-8. [Licença](#licença)
+7. [Testes](#testes)
+8. [Equipe](#equipe)
+9. [Licença](#licença)
 
 ## Documentação Complementar
 
@@ -118,6 +119,55 @@ streamlit run app.py
 - **Período**: Configurável (padrão: últimos 2 anos)
 - **Frequência**: Diária
 - **Processamento**: Cálculo automático de retornos percentuais
+
+## Testes
+
+O projeto inclui uma suíte abrangente de testes unitários para validar todos os módulos principais:
+
+### Estrutura dos Testes
+
+- **`test/test_chromosome.py`**: Testes para a classe abstrata Chromosome
+- **`test/test_data_collector.py`**: Testes para coleta e processamento de dados
+- **`test/test_portfolio.py`**: Testes para funcionalidade de portfólio
+- **`test/test_genetic_algorithm.py`**: Testes para o algoritmo genético
+- **`test/run_all_tests.py`**: Script centralizador para execução de todos os testes
+
+### Como Executar os Testes
+
+#### Executar Todos os Testes
+```bash
+cd test
+python run_all_tests.py
+```
+
+#### Executar Testes de um Módulo Específico
+```bash
+python run_all_tests.py --module portfolio
+python run_all_tests.py --module genetic_algorithm
+python run_all_tests.py --module data_collector
+python run_all_tests.py --module chromosome
+```
+
+#### Executar com Saída Detalhada
+```bash
+python run_all_tests.py --verbose
+```
+
+#### Executar Testes Individuais
+```bash
+python -m unittest test_portfolio.py
+python -m unittest test_genetic_algorithm.py
+```
+
+### Cobertura dos Testes
+
+Os testes cobrem:
+- Funcionalidades básicas de todos os módulos
+- Casos extremos (edge cases)
+- Validação de parâmetros
+- Testes de integração
+- Comportamento com dados mockados
+- Tratamento de erros
 
 ## Equipe
 

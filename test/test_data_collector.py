@@ -20,41 +20,41 @@ from data_collector import add_suffix, create_tickers_array, DataCollector, _dow
 
 class TestUtilityFunctions:
         
-    def test_add_suffix_basic(self):
+    def test_adicionar_sufixo_basico(self):
         result = add_suffix("PETR4")
         assert result == "PETR4.SA"
     
-    def test_add_suffix_empty_string(self):
+    def test_adicionar_sufixo_string_vazia(self):
         result = add_suffix("")
         assert result == ".SA"
     
-    def test_add_suffix_with_spaces(self):
+    def test_adicionar_sufixo_com_espacos(self):
         result = add_suffix("PETR 4")
         assert result == "PETR 4.SA"
     
-    def test_add_suffix_with_numbers(self):
+    def test_adicionar_sufixo_com_numeros(self):
         result = add_suffix("123")
         assert result == "123.SA"
     
-    def test_add_suffix_with_special_characters(self):
+    def test_adicionar_sufixo_com_caracteres_especiais(self):
         result = add_suffix("PETR-4")
         assert result == "PETR-4.SA"
     
-    def test_create_tickers_array_basic(self):
+    def test_criar_array_tickers_basico(self):
         tickers = ["PETR4", "VALE3", "ITUB4"]
         result = create_tickers_array(tickers)
         expected = ["PETR4.SA", "VALE3.SA", "ITUB4.SA"]
         assert result == expected
     
-    def test_create_tickers_array_empty_list(self):
+    def test_criar_array_tickers_lista_vazia(self):
         result = create_tickers_array([])
         assert result == []
     
-    def test_create_tickers_array_single_ticker(self):
+    def test_criar_array_tickers_ticker_unico(self):
         result = create_tickers_array(["PETR4"])
         assert result == ["PETR4.SA"]
     
-    def test_create_tickers_array_preserves_order(self):
+    def test_criar_array_tickers_preserva_ordem(self):
         tickers = ["VALE3", "PETR4", "ITUB4", "BBDC4"]
         result = create_tickers_array(tickers)
         expected = ["VALE3.SA", "PETR4.SA", "ITUB4.SA", "BBDC4.SA"]
@@ -63,7 +63,7 @@ class TestUtilityFunctions:
 
 class TestDataCollectorInitialization:
         
-    def test_init_with_defaults(self):
+    def test_inicializar_com_valores_padrao(self):
         tickers = ["PETR4", "VALE3"]
         collector = DataCollector(tickers)
         
@@ -76,7 +76,7 @@ class TestDataCollectorInitialization:
         assert isinstance(collector.end, datetime)
         assert collector.start < collector.end
     
-    def test_init_with_custom_values(self):
+    def test_inicializar_com_valores_customizados(self):
         tickers = ["PETR4", "VALE3"]
         benchmark = "^GSPC"
         start_date = datetime(2023, 1, 1)
@@ -96,11 +96,11 @@ class TestDataCollectorInitialization:
         assert collector.end == end_date
         assert not collector.cache
     
-    def test_init_with_empty_tickers(self):
+    def test_inicializar_com_tickers_vazios(self):
         collector = DataCollector([])
         assert collector.tickers == []
     
-    def test_init_date_validation(self):
+    def test_inicializar_validacao_data(self):
         tickers = ["PETR4"]
         start_date = datetime(2023, 1, 1)
         end_date = datetime(2022, 12, 31)  # Data final anterior à inicial
@@ -118,7 +118,7 @@ class TestDataCollectorDownload:
         self.collector = DataCollector(self.tickers)
     
     @patch('data_collector._download_data_cached')
-    def test_download_data_calls_cached_function(self, mock_cached):
+    def test_download_dados_chama_funcao_cache(self, mock_cached):
         # Configura o mock para retornar um DataFrame válido
         mock_data = pd.DataFrame({
             'PETR4.SA': [0.01, 0.02, -0.01],
@@ -141,7 +141,7 @@ class TestDataCollectorDownload:
         pd.testing.assert_frame_equal(result, mock_data)
     
     @patch('data_collector._download_data_cached')
-    def test_download_data_with_custom_parameters(self, mock_cached):
+    def test_download_dados_com_parametros_customizados(self, mock_cached):
         custom_benchmark = "^GSPC"
         start_date = datetime(2023, 1, 1)
         end_date = datetime(2023, 6, 30)
@@ -176,7 +176,7 @@ class TestDownloadDataCached:
     
     
     @patch('data_collector.yf.download')
-    def test_download_data_cached_single_ticker(self, mock_yf_download):
+    def test_download_dados_cache_ticker_unico(self, mock_yf_download):
         single_ticker = ("PETR4",)
         
         # Mock para um único ticker
@@ -192,7 +192,7 @@ class TestDownloadDataCached:
         assert isinstance(result, pd.DataFrame)
     
     @patch('data_collector.yf.download')
-    def test_download_data_cached_handles_existing_suffix(self, mock_yf_download):
+    def test_download_dados_cache_trata_sufixo_existente(self, mock_yf_download):
         tickers_with_suffix = ("PETR4.SA", "VALE3")
         
         mock_data = pd.DataFrame()
@@ -207,7 +207,7 @@ class TestDownloadDataCached:
         assert "PETR4.SA.SA" not in call_args
     
     @patch('data_collector.yf.download')
-    def test_download_data_cached_handles_benchmark_without_suffix(self, mock_yf_download):
+    def test_download_dados_cache_trata_benchmark_sem_sufixo(self, mock_yf_download):
         mock_data = pd.DataFrame()
         mock_yf_download.return_value = mock_data
         
@@ -223,20 +223,20 @@ class TestDownloadDataCached:
 
 class TestEdgeCases:
     
-    def test_data_collector_with_none_values(self):
+    def test_coletor_dados_com_valores_none(self):
         with pytest.raises(TypeError):
             DataCollector(None)
     
-    def test_add_suffix_with_none(self):
+    def test_adicionar_sufixo_com_none(self):
         with pytest.raises(TypeError):
             add_suffix(None)
     
-    def test_create_tickers_array_with_none_elements(self):
+    def test_criar_array_tickers_com_elementos_none(self):
         with pytest.raises(TypeError):
             create_tickers_array([None, "PETR4"])
     
     @patch('data_collector.yf.download')
-    def test_download_with_invalid_dates(self, mock_yf_download):
+    def test_download_com_datas_invalidas(self, mock_yf_download):
         mock_yf_download.return_value = pd.DataFrame()
         
         # Data final anterior à inicial

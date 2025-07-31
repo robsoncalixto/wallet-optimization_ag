@@ -67,7 +67,7 @@ class TestGeneticAlgorithmInitialization:
         self.mutation_rate = 0.1
         self.crossover_rate = 0.8
     
-    def test_init_basic(self):
+    def test_inicializar_basico(self):
         ga = GeneticAlgorithm(
             population=self.population,
             threshold=self.threshold,
@@ -84,7 +84,7 @@ class TestGeneticAlgorithmInitialization:
         assert ga._selection_type == GeneticAlgorithm.SelectionType.TOURNAMENT
         assert ga._elitism
     
-    def test_init_with_custom_selection_type(self):
+    def test_inicializar_com_tipo_selecao_customizado(self):
         ga = GeneticAlgorithm(
             population=self.population,
             threshold=self.threshold,
@@ -96,7 +96,7 @@ class TestGeneticAlgorithmInitialization:
         
         assert ga._selection_type == GeneticAlgorithm.SelectionType.TOURNAMENT
     
-    def test_init_with_custom_fitness_key(self):
+    def test_inicializar_com_chave_fitness_customizada(self):
         def custom_fitness(chromosome):
             return chromosome.value * 2
         
@@ -111,7 +111,7 @@ class TestGeneticAlgorithmInitialization:
         
         assert ga._fitness_key == custom_fitness
     
-    def test_init_without_elitism(self):
+    def test_inicializar_sem_elitismo(self):
         ga = GeneticAlgorithm(
             population=self.population,
             threshold=self.threshold,
@@ -123,7 +123,7 @@ class TestGeneticAlgorithmInitialization:
         
         assert not ga._elitism
     
-    def test_init_with_empty_population(self):
+    def test_inicializar_com_populacao_vazia(self):
         empty_population = []
         ga = GeneticAlgorithm(
             population=empty_population,
@@ -138,10 +138,10 @@ class TestGeneticAlgorithmInitialization:
 
 class TestSelectionType:
     
-    def test_selection_type_enum(self):
+    def test_enum_tipo_selecao(self):
         assert GeneticAlgorithm.SelectionType.TOURNAMENT.value == "tournament"
     
-    def test_selection_type_available(self):
+    def test_tipo_selecao_disponivel(self):
         selection_types = list(GeneticAlgorithm.SelectionType)
         assert GeneticAlgorithm.SelectionType.TOURNAMENT in selection_types
 
@@ -159,17 +159,17 @@ class TestTournamentSelection:
             crossover_rate=0.8
         )
     
-    def test_pick_tournament_returns_tuple(self):
+    def test_escolher_torneio_retorna_tupla(self):
         result = self.ga._pick_tournament()
         assert isinstance(result, tuple)
         assert len(result) == 2
     
-    def test_pick_tournament_returns_chromosomes(self):
+    def test_escolher_torneio_retorna_cromossomos(self):
         parent1, parent2 = self.ga._pick_tournament()
         assert isinstance(parent1, MockChromosome)
         assert isinstance(parent2, MockChromosome)
     
-    def test_pick_tournament_selects_best(self):
+    def test_escolher_torneio_seleciona_melhor(self):
         # Com população pequena e muitos competidores, deve selecionar os melhores
         parent1, parent2 = self.ga._pick_tournament(competitors=8)
         
@@ -177,7 +177,7 @@ class TestTournamentSelection:
         assert parent1.fitness() >= 5.0
         assert parent2.fitness() >= 5.0
     
-    def test_pick_tournament_with_different_competitors(self):
+    def test_escolher_torneio_com_competidores_diferentes(self):
         # Testa com 2 competidores
         result_2 = self.ga._pick_tournament(competitors=2)
         assert len(result_2) == 2
@@ -186,7 +186,7 @@ class TestTournamentSelection:
         result_5 = self.ga._pick_tournament(competitors=5)
         assert len(result_5) == 2
     
-    def test_pick_tournament_with_single_competitor(self):
+    def test_escolher_torneio_com_competidor_unico(self):
         result = self.ga._pick_tournament(competitors=1)
         assert len(result) == 2
         # Com 1 competidor, pode retornar o mesmo cromossomo duas vezes
@@ -204,13 +204,13 @@ class TestReduceReplace:
             crossover_rate=1.0  # 100% crossover para teste
         )
     
-    def test_reduce_replace_maintains_population_size(self):
+    def test_reduzir_substituir_mantem_tamanho_populacao(self):
         original_size = len(self.ga._population)
         self.ga._reduce_replace()
         
         assert len(self.ga._population) == original_size
     
-    def test_reduce_replace_creates_new_population(self):
+    def test_reduzir_substituir_cria_nova_populacao(self):
         original_population = self.ga._population.copy()
         self.ga._reduce_replace()
         
@@ -219,7 +219,7 @@ class TestReduceReplace:
             assert id(chromosome) != id(original_population[i])
     
     @patch('random.random')
-    def test_reduce_replace_with_no_crossover(self, mock_random):
+    def test_reduzir_substituir_sem_crossover(self, mock_random):
         # Força random() a retornar valor alto (sem crossover)
         mock_random.return_value = 0.9
         
@@ -237,7 +237,7 @@ class TestReduceReplace:
         assert len(ga._population) == len(self.population)
     
     @patch('random.random')
-    def test_reduce_replace_with_full_crossover(self, mock_random):
+    def test_reduzir_substituir_com_crossover_completo(self, mock_random):
         # Força random() a retornar valor baixo (sempre crossover)
         mock_random.return_value = 0.1
         
@@ -268,7 +268,7 @@ class TestElitism:
             elitism=True
         )
     
-    def test_apply_elitism_with_elitism_enabled(self):
+    def test_aplicar_elitismo_com_elitismo_habilitado(self):
         new_population = [MockChromosome(i * 0.5) for i in range(10)]  # fitness 0-4.5
         
         result = self.ga._apply_elitism(new_population)
@@ -283,7 +283,7 @@ class TestElitism:
         # O melhor da população original deve estar no resultado
         assert best_original.fitness() in result_fitness
     
-    def test_apply_elitism_with_elitism_disabled(self):
+    def test_aplicar_elitismo_com_elitismo_desabilitado(self):
         ga_no_elitism = GeneticAlgorithm(
             population=self.population,
             threshold=9.0,
@@ -299,7 +299,7 @@ class TestElitism:
         # Deve retornar a nova população sem modificações
         assert result == new_population
     
-    def test_apply_elitism_elite_size_calculation(self):
+    def test_aplicar_elitismo_calculo_tamanho_elite(self):
         # Com população de 10, elite deve ser 1 (max(1, 10//10))
         new_population = [MockChromosome(0) for _ in range(10)]
         result = self.ga._apply_elitism(new_population)
@@ -310,7 +310,7 @@ class TestElitism:
         
         assert best_original_fitness in result_fitness
     
-    def test_apply_elitism_with_small_population(self):
+    def test_aplicar_elitismo_com_populacao_pequena(self):
         small_population = [MockChromosome(5), MockChromosome(3)]
         ga_small = GeneticAlgorithm(
             population=small_population,
@@ -341,7 +341,7 @@ class TestMutation:
             crossover_rate=0.8
         )
     
-    def test_mutation_modifies_population(self):
+    def test_mutacao_modifica_populacao(self):
         original_values = [x.value for x in self.ga._population]
         self.ga._mutation()
         
@@ -350,7 +350,7 @@ class TestMutation:
         # Pelo menos alguns valores devem ter mudado
         assert original_values != new_values
     
-    def test_mutation_with_zero_rate(self):
+    def test_mutacao_com_taxa_zero(self):
         ga_no_mutation = GeneticAlgorithm(
             population=self.population,
             threshold=9.0,
@@ -369,7 +369,7 @@ class TestMutation:
     
     @patch('random.uniform')
     @patch('random.random')
-    def test_mutation_probability(self, mock_random, mock_uniform):
+    def test_probabilidade_mutacao(self, mock_random, mock_uniform):
         # Força random() a retornar valores que impedem mutação
         mock_random.return_value = 0.9
         mock_uniform.return_value = 0.0  # Não altera o valor quando mutate é chamado
@@ -405,12 +405,12 @@ class TestGeneticAlgorithmRun:
         )
     
     @patch('builtins.print')  # Mock print para evitar output durante testes
-    def test_run_returns_chromosome(self, mock_print):
+    def test_executar_retorna_cromossomo(self, mock_print):
         result = self.ga.run()
         assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
-    def test_run_returns_best_chromosome(self, mock_print):
+    def test_executar_retorna_melhor_cromossomo(self, mock_print):
         result = self.ga.run()
         
         # Deve retornar um cromossomo com fitness alto
@@ -418,7 +418,7 @@ class TestGeneticAlgorithmRun:
         assert result.fitness() >= 0
     
     @patch('builtins.print')
-    def test_run_early_termination(self, mock_print):
+    def test_executar_terminacao_antecipada(self, mock_print):
         # Cria população com um cromossomo que já atinge o threshold
         high_fitness_population = [MockChromosome(15.0)] + [MockChromosome(i) for i in range(4)]
         
@@ -436,7 +436,7 @@ class TestGeneticAlgorithmRun:
         assert result.fitness() >= 10.0
     
     @patch('builtins.print')
-    def test_run_creates_results_dataframe(self, mock_print):
+    def test_executar_cria_dataframe_resultados(self, mock_print):
         self.ga.run()
         
         # Deve ter criado o atributo results
@@ -449,7 +449,7 @@ class TestGeneticAlgorithmRun:
             assert col in self.ga.results.columns
     
     @patch('builtins.print')
-    def test_run_with_zero_generations(self, mock_print):
+    def test_executar_com_zero_geracoes(self, mock_print):
         ga_zero_gen = GeneticAlgorithm(
             population=self.population,
             threshold=10.0,
@@ -464,7 +464,7 @@ class TestGeneticAlgorithmRun:
         assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
-    def test_run_with_elitism_disabled(self, mock_print):
+    def test_executar_com_elitismo_desabilitado(self, mock_print):
         ga_no_elitism = GeneticAlgorithm(
             population=self.population,
             threshold=10.0,
@@ -494,7 +494,7 @@ class TestShowResults:
     @patch('matplotlib.pyplot.plot')
     @patch('matplotlib.pyplot.figure')
     @patch('builtins.print')
-    def test_show_results_with_results(self, mock_print, mock_figure, mock_plot, mock_show):
+    def test_mostrar_resultados_com_resultados(self, mock_print, mock_figure, mock_plot, mock_show):
         # Executa o algoritmo para gerar resultados
         self.ga.run()
         
@@ -509,7 +509,7 @@ class TestShowResults:
         assert isinstance(result, pd.DataFrame)
     
     @patch('builtins.print')
-    def test_show_results_without_results(self, mock_print):
+    def test_mostrar_resultados_sem_resultados(self, mock_print):
         result = self.ga.show_results()
         
         # Deve imprimir mensagem de erro
@@ -522,7 +522,7 @@ class TestShowResults:
     @patch('matplotlib.pyplot.plot')
     @patch('matplotlib.pyplot.figure')
     @patch('builtins.print')
-    def test_show_results_plot_calls(self, mock_print, mock_figure, mock_plot, mock_show):
+    def test_mostrar_resultados_chamadas_plot(self, mock_print, mock_figure, mock_plot, mock_show):
         # Executa o algoritmo
         self.ga.run()
         
@@ -536,7 +536,7 @@ class TestShowResults:
 class TestGeneticAlgorithmIntegration:
     
     @patch('builtins.print')
-    def test_full_optimization_workflow(self, mock_print):
+    def test_fluxo_completo_otimizacao(self, mock_print):
         # Cria população inicial
         population = [MockChromosome(i) for i in range(10)]
         
@@ -564,7 +564,7 @@ class TestGeneticAlgorithmIntegration:
         assert len(ga.results) > 0
     
     @patch('builtins.print')
-    def test_convergence_behavior(self, mock_print):
+    def test_comportamento_convergencia(self, mock_print):
         # Cria população com fitness baixos
         population = [MockChromosome(0.1 * i) for i in range(5)]
         
@@ -589,7 +589,7 @@ class TestGeneticAlgorithmIntegration:
 
 class TestEdgeCases:
     
-    def test_genetic_algorithm_with_single_chromosome(self):
+    def test_algoritmo_genetico_com_cromossomo_unico(self):
         single_population = [MockChromosome(5.0)]
         
         ga = GeneticAlgorithm(
@@ -605,7 +605,7 @@ class TestEdgeCases:
         
         assert isinstance(result, MockChromosome)
     
-    def test_genetic_algorithm_with_identical_chromosomes(self):
+    def test_algoritmo_genetico_com_cromossomos_identicos(self):
         identical_population = [MockChromosome(3.0) for _ in range(5)]
         
         ga = GeneticAlgorithm(
@@ -621,7 +621,7 @@ class TestEdgeCases:
         
         assert isinstance(result, MockChromosome)
     
-    def test_genetic_algorithm_with_extreme_parameters(self):
+    def test_algoritmo_genetico_com_parametros_extremos(self):
         population = [MockChromosome(i) for i in range(3)]
         
         # Parâmetros extremos
@@ -639,7 +639,7 @@ class TestEdgeCases:
         assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
-    def test_genetic_algorithm_with_negative_fitness(self, mock_print):
+    def test_algoritmo_genetico_com_fitness_negativo(self, mock_print):
         negative_population = [MockChromosome(-i) for i in range(1, 6)]  # -1 a -5
         
         ga = GeneticAlgorithm(

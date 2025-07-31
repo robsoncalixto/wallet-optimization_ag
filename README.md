@@ -3,7 +3,6 @@
 ![Tests](https://github.com/robsoncalixto/wallet_optimization_ag/actions/workflows/tests.yml/badge.svg)
 ![Python](https://img.shields.io/badge/Python-3.12.2-brightgreen)
 ![pytest](https://img.shields.io/badge/pytest-8.4.1-blue)
-![Coverage](https://codecov.io/gh/robsoncalixto/wallet_optimization_ag/branch/master/graph/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Descrição

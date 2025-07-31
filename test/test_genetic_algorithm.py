@@ -6,7 +6,7 @@ incluindo testes de funcionalidade, convergência e diferentes estratégias
 de seleção e otimização.
 """
 
-import unittest
+import pytest
 from unittest.mock import patch, MagicMock, Mock
 import pandas as pd
 import numpy as np
@@ -58,9 +58,9 @@ class MockChromosome(Chromosome):
         return f"MockChromosome({self.value:.3f})"
 
 
-class TestGeneticAlgorithmInitialization(unittest.TestCase):
+class TestGeneticAlgorithmInitialization:
     
-    def setUp(self):
+    def setup_method(self):
         self.population = [MockChromosome(i) for i in range(10)]
         self.threshold = 9.0
         self.max_generations = 100
@@ -76,13 +76,13 @@ class TestGeneticAlgorithmInitialization(unittest.TestCase):
             crossover_rate=self.crossover_rate
         )
         
-        self.assertEqual(ga._population, self.population)
-        self.assertEqual(ga._threshold, self.threshold)
-        self.assertEqual(ga._max_generations, self.max_generations)
-        self.assertEqual(ga._mutation_rate, self.mutation_rate)
-        self.assertEqual(ga._crossover_rate, self.crossover_rate)
-        self.assertEqual(ga._selection_type, GeneticAlgorithm.SelectionType.TOURNAMENT)
-        self.assertTrue(ga._elitism)
+        assert ga._population == self.population
+        assert ga._threshold == self.threshold
+        assert ga._max_generations == self.max_generations
+        assert ga._mutation_rate == self.mutation_rate
+        assert ga._crossover_rate == self.crossover_rate
+        assert ga._selection_type == GeneticAlgorithm.SelectionType.TOURNAMENT
+        assert ga._elitism
     
     def test_init_with_custom_selection_type(self):
         ga = GeneticAlgorithm(
@@ -94,7 +94,7 @@ class TestGeneticAlgorithmInitialization(unittest.TestCase):
             selection_type=GeneticAlgorithm.SelectionType.TOURNAMENT
         )
         
-        self.assertEqual(ga._selection_type, GeneticAlgorithm.SelectionType.TOURNAMENT)
+        assert ga._selection_type == GeneticAlgorithm.SelectionType.TOURNAMENT
     
     def test_init_with_custom_fitness_key(self):
         def custom_fitness(chromosome):
@@ -109,7 +109,7 @@ class TestGeneticAlgorithmInitialization(unittest.TestCase):
             fitness_key=custom_fitness
         )
         
-        self.assertEqual(ga._fitness_key, custom_fitness)
+        assert ga._fitness_key == custom_fitness
     
     def test_init_without_elitism(self):
         ga = GeneticAlgorithm(
@@ -121,7 +121,7 @@ class TestGeneticAlgorithmInitialization(unittest.TestCase):
             elitism=False
         )
         
-        self.assertFalse(ga._elitism)
+        assert not ga._elitism
     
     def test_init_with_empty_population(self):
         empty_population = []
@@ -133,22 +133,22 @@ class TestGeneticAlgorithmInitialization(unittest.TestCase):
             crossover_rate=self.crossover_rate
         )
         
-        self.assertEqual(ga._population, empty_population)
+        assert ga._population == empty_population
 
 
-class TestSelectionType(unittest.TestCase):
+class TestSelectionType:
     
     def test_selection_type_enum(self):
-        self.assertEqual(GeneticAlgorithm.SelectionType.TOURNAMENT.value, "tournament")
+        assert GeneticAlgorithm.SelectionType.TOURNAMENT.value == "tournament"
     
     def test_selection_type_available(self):
         selection_types = list(GeneticAlgorithm.SelectionType)
-        self.assertIn(GeneticAlgorithm.SelectionType.TOURNAMENT, selection_types)
+        assert GeneticAlgorithm.SelectionType.TOURNAMENT in selection_types
 
 
-class TestTournamentSelection(unittest.TestCase):
+class TestTournamentSelection:
     
-    def setUp(self):
+    def setup_method(self):
         # Cria população com fitness conhecidos
         self.population = [MockChromosome(i) for i in range(10)]  # fitness 0-9
         self.ga = GeneticAlgorithm(
@@ -161,40 +161,40 @@ class TestTournamentSelection(unittest.TestCase):
     
     def test_pick_tournament_returns_tuple(self):
         result = self.ga._pick_tournament()
-        self.assertIsInstance(result, tuple)
-        self.assertEqual(len(result), 2)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
     
     def test_pick_tournament_returns_chromosomes(self):
         parent1, parent2 = self.ga._pick_tournament()
-        self.assertIsInstance(parent1, MockChromosome)
-        self.assertIsInstance(parent2, MockChromosome)
+        assert isinstance(parent1, MockChromosome)
+        assert isinstance(parent2, MockChromosome)
     
     def test_pick_tournament_selects_best(self):
         # Com população pequena e muitos competidores, deve selecionar os melhores
         parent1, parent2 = self.ga._pick_tournament(competitors=8)
         
         # Os pais devem ter fitness alto
-        self.assertGreaterEqual(parent1.fitness(), 5.0)
-        self.assertGreaterEqual(parent2.fitness(), 5.0)
+        assert parent1.fitness() >= 5.0
+        assert parent2.fitness() >= 5.0
     
     def test_pick_tournament_with_different_competitors(self):
         # Testa com 2 competidores
         result_2 = self.ga._pick_tournament(competitors=2)
-        self.assertEqual(len(result_2), 2)
+        assert len(result_2) == 2
         
         # Testa com 5 competidores
         result_5 = self.ga._pick_tournament(competitors=5)
-        self.assertEqual(len(result_5), 2)
+        assert len(result_5) == 2
     
     def test_pick_tournament_with_single_competitor(self):
         result = self.ga._pick_tournament(competitors=1)
-        self.assertEqual(len(result), 2)
+        assert len(result) == 2
         # Com 1 competidor, pode retornar o mesmo cromossomo duas vezes
 
 
-class TestReduceReplace(unittest.TestCase):
+class TestReduceReplace:
     
-    def setUp(self):
+    def setup_method(self):
         self.population = [MockChromosome(i) for i in range(6)]
         self.ga = GeneticAlgorithm(
             population=self.population,
@@ -208,7 +208,7 @@ class TestReduceReplace(unittest.TestCase):
         original_size = len(self.ga._population)
         self.ga._reduce_replace()
         
-        self.assertEqual(len(self.ga._population), original_size)
+        assert len(self.ga._population) == original_size
     
     def test_reduce_replace_creates_new_population(self):
         original_population = self.ga._population.copy()
@@ -216,7 +216,7 @@ class TestReduceReplace(unittest.TestCase):
         
         # A população deve ser diferente (novos objetos)
         for i, chromosome in enumerate(self.ga._population):
-            self.assertNotEqual(id(chromosome), id(original_population[i]))
+            assert id(chromosome) != id(original_population[i])
     
     @patch('random.random')
     def test_reduce_replace_with_no_crossover(self, mock_random):
@@ -234,7 +234,7 @@ class TestReduceReplace(unittest.TestCase):
         ga._reduce_replace()
         
         # População deve ter o mesmo tamanho
-        self.assertEqual(len(ga._population), len(self.population))
+        assert len(ga._population) == len(self.population)
     
     @patch('random.random')
     def test_reduce_replace_with_full_crossover(self, mock_random):
@@ -252,12 +252,12 @@ class TestReduceReplace(unittest.TestCase):
         ga._reduce_replace()
         
         # População deve ter o mesmo tamanho
-        self.assertEqual(len(ga._population), len(self.population))
+        assert len(ga._population) == len(self.population)
 
 
-class TestElitism(unittest.TestCase):
+class TestElitism:
     
-    def setUp(self):
+    def setup_method(self):
         self.population = [MockChromosome(i) for i in range(10)]
         self.ga = GeneticAlgorithm(
             population=self.population,
@@ -274,14 +274,14 @@ class TestElitism(unittest.TestCase):
         result = self.ga._apply_elitism(new_population)
         
         # Resultado deve ter o mesmo tamanho
-        self.assertEqual(len(result), len(self.population))
+        assert len(result) == len(self.population)
         
         # Deve conter alguns dos melhores da população original
         best_original = max(self.population, key=lambda x: x.fitness())
         result_fitness = [x.fitness() for x in result]
         
         # O melhor da população original deve estar no resultado
-        self.assertIn(best_original.fitness(), result_fitness)
+        assert best_original.fitness() in result_fitness
     
     def test_apply_elitism_with_elitism_disabled(self):
         ga_no_elitism = GeneticAlgorithm(
@@ -297,7 +297,7 @@ class TestElitism(unittest.TestCase):
         result = ga_no_elitism._apply_elitism(new_population)
         
         # Deve retornar a nova população sem modificações
-        self.assertEqual(result, new_population)
+        assert result == new_population
     
     def test_apply_elitism_elite_size_calculation(self):
         # Com população de 10, elite deve ser 1 (max(1, 10//10))
@@ -308,7 +308,7 @@ class TestElitism(unittest.TestCase):
         best_original_fitness = max(x.fitness() for x in self.population)
         result_fitness = [x.fitness() for x in result]
         
-        self.assertIn(best_original_fitness, result_fitness)
+        assert best_original_fitness in result_fitness
     
     def test_apply_elitism_with_small_population(self):
         small_population = [MockChromosome(5), MockChromosome(3)]
@@ -324,14 +324,14 @@ class TestElitism(unittest.TestCase):
         new_population = [MockChromosome(1), MockChromosome(2)]
         result = ga_small._apply_elitism(new_population)
         
-        self.assertEqual(len(result), 2)
+        assert len(result) == 2
         # Deve preservar pelo menos o melhor
-        self.assertIn(5.0, [x.fitness() for x in result])
+        assert 5.0 in [x.fitness() for x in result]
 
 
-class TestMutation(unittest.TestCase):
+class TestMutation:
     
-    def setUp(self):
+    def setup_method(self):
         self.population = [MockChromosome(5.0) for _ in range(5)]
         self.ga = GeneticAlgorithm(
             population=self.population,
@@ -348,7 +348,7 @@ class TestMutation(unittest.TestCase):
         new_values = [x.value for x in self.ga._population]
         
         # Pelo menos alguns valores devem ter mudado
-        self.assertNotEqual(original_values, new_values)
+        assert original_values != new_values
     
     def test_mutation_with_zero_rate(self):
         ga_no_mutation = GeneticAlgorithm(
@@ -365,7 +365,7 @@ class TestMutation(unittest.TestCase):
         new_values = [x.value for x in ga_no_mutation._population]
         
         # Valores não devem ter mudado
-        self.assertEqual(original_values, new_values)
+        assert original_values == new_values
     
     @patch('random.uniform')
     @patch('random.random')
@@ -388,12 +388,12 @@ class TestMutation(unittest.TestCase):
         new_values = [x.value for x in ga_low_mutation._population]
         
         # Com random() = 0.9 e mutation_rate = 0.5, não deve mutar
-        self.assertEqual(original_values, new_values)
+        assert original_values == new_values
 
 
-class TestGeneticAlgorithmRun(unittest.TestCase):
+class TestGeneticAlgorithmRun:
     
-    def setUp(self):
+    def setup_method(self):
         # Cria população com fitness variados
         self.population = [MockChromosome(i) for i in range(5)]
         self.ga = GeneticAlgorithm(
@@ -407,15 +407,15 @@ class TestGeneticAlgorithmRun(unittest.TestCase):
     @patch('builtins.print')  # Mock print para evitar output durante testes
     def test_run_returns_chromosome(self, mock_print):
         result = self.ga.run()
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
     def test_run_returns_best_chromosome(self, mock_print):
         result = self.ga.run()
         
         # Deve retornar um cromossomo com fitness alto
-        self.assertIsInstance(result, MockChromosome)
-        self.assertGreaterEqual(result.fitness(), 0)
+        assert isinstance(result, MockChromosome)
+        assert result.fitness() >= 0
     
     @patch('builtins.print')
     def test_run_early_termination(self, mock_print):
@@ -433,20 +433,20 @@ class TestGeneticAlgorithmRun(unittest.TestCase):
         result = ga_early.run()
         
         # Deve retornar rapidamente com o melhor cromossomo
-        self.assertGreaterEqual(result.fitness(), 10.0)
+        assert result.fitness() >= 10.0
     
     @patch('builtins.print')
     def test_run_creates_results_dataframe(self, mock_print):
         self.ga.run()
         
         # Deve ter criado o atributo results
-        self.assertTrue(hasattr(self.ga, 'results'))
-        self.assertIsInstance(self.ga.results, pd.DataFrame)
+        assert hasattr(self.ga, 'results')
+        assert isinstance(self.ga.results, pd.DataFrame)
         
         # DataFrame deve ter as colunas esperadas
         expected_columns = ['gens', 'best_fitness', 'mean_fitness']
         for col in expected_columns:
-            self.assertIn(col, self.ga.results.columns)
+            assert col in self.ga.results.columns
     
     @patch('builtins.print')
     def test_run_with_zero_generations(self, mock_print):
@@ -461,7 +461,7 @@ class TestGeneticAlgorithmRun(unittest.TestCase):
         result = ga_zero_gen.run()
         
         # Deve retornar o melhor da população inicial
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
     def test_run_with_elitism_disabled(self, mock_print):
@@ -475,12 +475,12 @@ class TestGeneticAlgorithmRun(unittest.TestCase):
         )
         
         result = ga_no_elitism.run()
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
 
 
-class TestShowResults(unittest.TestCase):
+class TestShowResults:
     
-    def setUp(self):
+    def setup_method(self):
         self.population = [MockChromosome(i) for i in range(3)]
         self.ga = GeneticAlgorithm(
             population=self.population,
@@ -502,11 +502,11 @@ class TestShowResults(unittest.TestCase):
         result = self.ga.show_results()
         
         # Verifica se matplotlib foi chamado
-        self.assertTrue(mock_figure.called)
+        assert mock_figure.called
         mock_show.assert_called_once()
         
         # Deve retornar o DataFrame de resultados
-        self.assertIsInstance(result, pd.DataFrame)
+        assert isinstance(result, pd.DataFrame)
     
     @patch('builtins.print')
     def test_show_results_without_results(self, mock_print):
@@ -516,7 +516,7 @@ class TestShowResults(unittest.TestCase):
         mock_print.assert_called_with("Nenhum resultado disponível. Execute o algoritmo primeiro.")
         
         # Deve retornar None
-        self.assertIsNone(result)
+        assert result is None
     
     @patch('matplotlib.pyplot.show')
     @patch('matplotlib.pyplot.plot')
@@ -530,10 +530,10 @@ class TestShowResults(unittest.TestCase):
         self.ga.show_results()
         
         # Verifica se plot foi chamado duas vezes (best e mean fitness)
-        self.assertEqual(mock_plot.call_count, 2)
+        assert mock_plot.call_count == 2
 
 
-class TestGeneticAlgorithmIntegration(unittest.TestCase):
+class TestGeneticAlgorithmIntegration:
     
     @patch('builtins.print')
     def test_full_optimization_workflow(self, mock_print):
@@ -554,14 +554,14 @@ class TestGeneticAlgorithmIntegration(unittest.TestCase):
         best = ga.run()
         
         # Verificações
-        self.assertIsInstance(best, MockChromosome)
-        self.assertTrue(hasattr(ga, 'results'))
+        assert isinstance(best, MockChromosome)
+        assert hasattr(ga, 'results')
         
         # O melhor deve ter fitness razoável
-        self.assertGreaterEqual(best.fitness(), 0)
+        assert best.fitness() >= 0
         
         # Results deve ter dados de todas as gerações
-        self.assertGreater(len(ga.results), 0)
+        assert len(ga.results) > 0
     
     @patch('builtins.print')
     def test_convergence_behavior(self, mock_print):
@@ -584,10 +584,10 @@ class TestGeneticAlgorithmIntegration(unittest.TestCase):
         final_best = best.fitness()
         
         # O algoritmo deve ter mantido ou melhorado o fitness
-        self.assertGreaterEqual(final_best, initial_best - 0.5)  # Tolerância para mutação
+        assert final_best >= initial_best - 0.5  # Tolerância para mutação
 
 
-class TestEdgeCases(unittest.TestCase):
+class TestEdgeCases:
     
     def test_genetic_algorithm_with_single_chromosome(self):
         single_population = [MockChromosome(5.0)]
@@ -603,7 +603,7 @@ class TestEdgeCases(unittest.TestCase):
         with patch('builtins.print'):
             result = ga.run()
         
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
     
     def test_genetic_algorithm_with_identical_chromosomes(self):
         identical_population = [MockChromosome(3.0) for _ in range(5)]
@@ -619,7 +619,7 @@ class TestEdgeCases(unittest.TestCase):
         with patch('builtins.print'):
             result = ga.run()
         
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
     
     def test_genetic_algorithm_with_extreme_parameters(self):
         population = [MockChromosome(i) for i in range(3)]
@@ -636,7 +636,7 @@ class TestEdgeCases(unittest.TestCase):
         with patch('builtins.print'):
             result = ga.run()
         
-        self.assertIsInstance(result, MockChromosome)
+        assert isinstance(result, MockChromosome)
     
     @patch('builtins.print')
     def test_genetic_algorithm_with_negative_fitness(self, mock_print):
@@ -653,10 +653,10 @@ class TestEdgeCases(unittest.TestCase):
         result = ga.run()
         
         # Deve retornar o menos negativo (melhor fitness)
-        self.assertIsInstance(result, MockChromosome)
-        self.assertLessEqual(result.fitness(), 0)
+        assert isinstance(result, MockChromosome)
+        assert result.fitness() <= 0
 
 
 if __name__ == '__main__':
     # Configuração para executar os testes
-    unittest.main(verbosity=2)
+    pytest.main([__file__, "-v"])

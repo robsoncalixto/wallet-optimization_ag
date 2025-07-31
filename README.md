@@ -1,5 +1,11 @@
 # Otimização de Portfólio com Algoritmo Genético
 
+![Tests](https://github.com/robsoncalixto/wallet_optimization_ag/actions/workflows/tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/Python-3.12.2-brightgreen)
+![pytest](https://img.shields.io/badge/pytest-8.4.1-blue)
+![Coverage](https://codecov.io/gh/robsoncalixto/wallet_optimization_ag/branch/master/graph/badge.svg)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 ## Descrição
 
 Este projeto implementa um sistema de otimização de portfólio de investimentos utilizando **Algoritmos Genéticos (AG)** para encontrar a alocação ideal de capital entre diferentes ativos da Bolsa de Valores Brasileira (B3). O objetivo é maximizar o retorno ajustado ao risco, considerando métricas de risco como o **Conditional Value at Risk (CVaR)**.
@@ -93,7 +99,7 @@ streamlit run app.py
 
 A interface web oferece:
 - 📊 Seleção interativa de ações da B3
-- ⚙️ Configuração de parâmetros do algoritmo genético
+- ⚙️ Visualização dos parâmetros do algoritmo genético
 - 📉 Gráficos de convergência e composição do portfólio
 - 📊 Comparação com benchmarks (Bovespa)
 
@@ -122,52 +128,24 @@ streamlit run app.py
 
 ## Testes
 
-O projeto inclui uma suíte abrangente de testes unitários para validar todos os módulos principais:
-
-### Estrutura dos Testes
-
-- **`test/test_chromosome.py`**: Testes para a classe abstrata Chromosome
-- **`test/test_data_collector.py`**: Testes para coleta e processamento de dados
-- **`test/test_portfolio.py`**: Testes para funcionalidade de portfólio
-- **`test/test_genetic_algorithm.py`**: Testes para o algoritmo genético
-- **`test/run_all_tests.py`**: Script centralizador para execução de todos os testes
-
 ### Como Executar os Testes
 
-#### Executar Todos os Testes
 ```bash
-cd test
-python run_all_tests.py
+# Executar todos os testes na raiz do projeto
+pytest test/ -v
 ```
 
-#### Executar Testes de um Módulo Específico
+#### Executar Testes de Arquivos Específicos
 ```bash
-python run_all_tests.py --module portfolio
-python run_all_tests.py --module genetic_algorithm
-python run_all_tests.py --module data_collector
-python run_all_tests.py --module chromosome
+# Testes do Portfolio
+pytest test/test_portfolio.py -v
+
+# Testes do Algoritmo Genético
+pytest test/test_genetic_algorithm.py -v
+
+# Testes do Coletor de Dados
+pytest test/test_data_collector.py -v
 ```
-
-#### Executar com Saída Detalhada
-```bash
-python run_all_tests.py --verbose
-```
-
-#### Executar Testes Individuais
-```bash
-python -m unittest test_portfolio.py
-python -m unittest test_genetic_algorithm.py
-```
-
-### Cobertura dos Testes
-
-Os testes cobrem:
-- Funcionalidades básicas de todos os módulos
-- Casos extremos (edge cases)
-- Validação de parâmetros
-- Testes de integração
-- Comportamento com dados mockados
-- Tratamento de erros
 
 ## Equipe
 
